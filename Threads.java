@@ -1,8 +1,8 @@
 import java.util.concurrent.Semaphore;
 
 public class Threads {
-    public static Semaphore Display = new Semaphore(4);
-    public static Semaphore Watch = new Semaphore(0);
+    public static Semaphore Display = new Semaphore(1);
+    public static Semaphore EnterRoom = new Semaphore(5);  // semaforo para controlar o numero de pessoas dentro da sala para assistir, quando chega em 0, o fã não pode entrar
 
     static class Demonstrator extends Thread {
 
@@ -34,10 +34,18 @@ public class Threads {
 
         public void run(){
             while (true) {
-                int crowd = 0;
 
-                if(crowd == this.getCapacity())
-                displayMovie();
+                if(EnterRoom.availablePermits() == 0){
+
+                    try {
+                        Display.acquire();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    displayMovie();
+                    Display.release();
+
+                }
 
             }
         }
@@ -72,10 +80,17 @@ public class Threads {
         }
 
         public void run(){
+
             while (true) {
 
+                try{ 
+                    EnterRoom.acquire();
+                }catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 watchMovie();
-
+                EnterRoom.release();
+                
                 eat();
 
             }
