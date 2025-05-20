@@ -32,12 +32,7 @@ public class Threads {
         }
 
         public void displayMovie(){
-            double soma = 0;
-            for (int i = 0; i < 1000; i++) {
-                for (int j = 0; j < 2000; j++) {
-                    soma = soma + Math.sin(i) + Math.sin(j);
-                }
-            }
+            //timer ate acabar o filme
         }
 
         public void run(){
@@ -58,7 +53,7 @@ public class Threads {
 
 
     static class Fan extends Thread {
-
+        private int id;
         private int eatingTimer;
 
         public Fan(int eatingTime){
