@@ -32,7 +32,12 @@ public class Threads {
         }
 
         public void displayMovie(){
-
+            double soma = 0;
+            for (int i = 0; i < 1000; i++) {
+                for (int j = 0; j < 2000; j++) {
+                    soma = soma + Math.sin(i) + Math.sin(j);
+                }
+            }
         }
 
         public void run(){
@@ -43,7 +48,7 @@ public class Threads {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                IsWatching.a
+                //IsWatching.a
                 displayMovie();
 
 
@@ -71,12 +76,22 @@ public class Threads {
 
         public void watchMovie(){
             //espera o displayMovie()
-
+            double soma = 0;
+            for (int i = 0; i < 1000; i++) {
+                for (int j = 0; j < 2000; j++) {
+                    soma = soma + Math.sin(i) + Math.sin(j);
+                }
+            }
         }
 
         public void eat(){
             //sai da sala e vai comer em tempo x | x = eatingTimer
-
+            double soma = 0;
+            for (int i = 0; i < 1000; i++) {
+                for (int j = 0; j < 2000; j++) {
+                    soma = soma + Math.sin(i) + Math.sin(j);
+                }
+            }
         }
 
         public void down(){
