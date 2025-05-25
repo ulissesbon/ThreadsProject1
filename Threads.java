@@ -3,9 +3,8 @@ import java.util.concurrent.Semaphore;
 public class Threads {
     public static Semaphore Display = new Semaphore(0);
     public static Semaphore Mutex = new Semaphore(1);
-    public static Semaphore Line = new Semaphore(0);
     public static Semaphore IsWatching = new Semaphore(0);
-    public static Semaphore EnterRoom = new Semaphore(5);  // semaforo para controlar o numero de pessoas dentro da sala para assistir, quando chega em 0, o fã não pode entrar
+    public static Semaphore EnterRoom = new Semaphore(5, true);  // semaforo para controlar o numero de pessoas dentro da sala para assistir, quando chega em 0, o fã não pode entrar
 
     static class Demonstrator extends Thread {
 
@@ -104,19 +103,12 @@ public class Threads {
         public void run(){
 
             while (true) {
-                Line.release();
-
                 // -----------------------------------------------
+               
                 down();
 
                 try{
                     EnterRoom.acquire();
-                }catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                try{ 
-                    Line.acquire();
                 }catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -141,14 +133,6 @@ public class Threads {
                 
                 watchMovie(); // fazer algo que todos vejam o mesmo filme ao mesmo tempo quando Display.release()
                 
-                // -----------------------------------------------
-                
-                down();
-
-                EnterRoom.release();
-                
-                up();
-
                 // -----------------------------------------------
 
                 eat();
