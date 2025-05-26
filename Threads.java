@@ -4,7 +4,10 @@ public class Threads {
     public static Semaphore Display = new Semaphore(0);
     public static Semaphore Mutex = new Semaphore(1);
     public static Semaphore IsWatching = new Semaphore(0);
-    public static Semaphore EnterRoom = new Semaphore(5, true);  // semaforo para controlar o numero de pessoas dentro da sala para assistir, quando chega em 0, o fã não pode entrar
+    public static Semaphore EnterRoom = new Semaphore(5, true);  // semaforo para controlar o numero de pessoas dentro da sala para assistir
+
+    private static int fanCounter = 0;
+    private static final Object fanIdLock = new Object();
 
     static class Demonstrator extends Thread {
 
@@ -30,8 +33,24 @@ public class Threads {
             return this.movieLength;
         }
 
-        public void displayMovie(){
-            //timer ate acabar o filme
+        public void displayMovie() {
+            System.out.println("[DEMONSTRADOR] Exibindo o filme por " + movieLength + " segundos.");
+            
+            for (int i = 1; i <= movieLength; i++) {
+                System.out.println("[DEMONSTRADOR] ... filme em exibição: " + i + "s");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            System.out.println("[DEMONSTRADOR] Filme finalizado.");
+
+            // Libera todos os fãs que estão assistindo
+            for (int i = 0; i < capacity; i++) {
+                IsWatching.release();
+            }
         }
 
         public void run(){
@@ -42,7 +61,7 @@ public class Threads {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                //IsWatching.a
+
                 displayMovie();
 
 
@@ -57,6 +76,10 @@ public class Threads {
 
         public Fan(int eatingTime){
             this.eatingTimer = eatingTime;
+            
+            synchronized (fanIdLock) {
+                this.id = fanCounter++;
+            }
         }
 
 
@@ -68,24 +91,30 @@ public class Threads {
         }
 
 
-        public void watchMovie(){
-            //espera o displayMovie()
-            double soma = 0;
-            for (int i = 0; i < 1000; i++) {
-                for (int j = 0; j < 2000; j++) {
-                    soma = soma + Math.sin(i) + Math.sin(j);
-                }
+        public void watchMovie() {
+            System.out.println("[FAN #" + id + "] iniciou a sessão do filme.");
+            // Simulação leve de CPU para fins didáticos:
+            try {
+                Thread.sleep(1000); // cada fã "assiste" por 1s antes de continuar
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 
-        public void eat(){
-            //sai da sala e vai comer em tempo x | x = eatingTimer
-            double soma = 0;
-            for (int i = 0; i < 1000; i++) {
-                for (int j = 0; j < 2000; j++) {
-                    soma = soma + Math.sin(i) + Math.sin(j);
+        public void eat() {
+ 
+            System.out.println("[FAN #" + id + "] foi lanchar por " + eatingTimer + " segundos.");
+    
+            for (int t = eatingTimer; t > 0; t--) {
+                System.out.println("[FAN #" + id + "] lanchando... tempo restante: " + t + "s");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
+
+            System.out.println("[FAN #" + id + "] terminou de lanchar e está voltando para assistir o filme novamente.");
         }
 
         public void down(){
@@ -104,7 +133,8 @@ public class Threads {
 
             while (true) {
                 // -----------------------------------------------
-               
+                System.out.println("[FAN #" + id + "] tentando entrar no auditório...");
+
                 down();
 
                 try{
@@ -112,7 +142,7 @@ public class Threads {
                 }catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
+                System.out.println("[FAN #" + id + "] entrou no auditório. Aguardando início da sessão.");
                 up();
 
                 // -----------------------------------------------
