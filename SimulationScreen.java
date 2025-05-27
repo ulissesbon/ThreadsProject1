@@ -5,14 +5,14 @@ import javax.swing.*;
 
 public class SimulationScreen extends JFrame {
 
-    public static Semaphore Display;
     public static Semaphore Mutex;
-    public static Semaphore IsWatching;
+    public static Semaphore Display;
     public static Semaphore EnterRoom;
+    public static Semaphore IsWatching;
 
     public enum FanStatus { WAITING, WATCHING, EATING }
 
-    private static int fanCounter = 0;
+    private static int fanCounter = 1;  // contagem de fãs começa por 1
 
     private JLayeredPane layeredPane;
 
@@ -23,14 +23,16 @@ public class SimulationScreen extends JFrame {
         setLocationRelativeTo(null);
         setLayout(null);
 
-        // Inicializa semáforos com base no código original
         Display = new Semaphore(0);
         Mutex = new Semaphore(1);
         IsWatching = new Semaphore(0);
         EnterRoom = new Semaphore(capacity, true);
 
         // Imagem de fundo
-        JLabel background = new JLabel(new ImageIcon("Gemini_Generated_Image_6op4f56op4f56op4 - Copia.png"));
+        layeredPane = new JLayeredPane();
+        layeredPane.setBounds(0, 0, 1000, 562);
+
+        JLabel background = new JLabel(new ImageIcon("background_betav1.png"));
         background.setBounds(0, 0, 1000, 562);
         layeredPane.add(background, JLayeredPane.DEFAULT_LAYER);
 
@@ -54,8 +56,9 @@ public class SimulationScreen extends JFrame {
                 int tempoLanche = Integer.parseInt(tempoLancheField.getText());
 
                 // Cria visual
-                String label = "F" + fanCounter;
-                Color cor = switch (fanCounter % 4) {
+                int id = fanCounter++;
+                String label = "F" + id;
+                Color cor = switch (id % 4) {
                     case 0 -> Color.RED;
                     case 1 -> Color.GREEN;
                     case 2 -> Color.BLUE;
@@ -64,7 +67,11 @@ public class SimulationScreen extends JFrame {
 
                 VisualFan visual = new VisualFan(label, cor);
                 layeredPane.add(visual, JLayeredPane.PALETTE_LAYER);
+                layeredPane.revalidate();
                 layeredPane.repaint();
+
+                VisualFanThreaded fanThread = new VisualFanThreaded(id, tempoLanche, movieTime, visual, layeredPane);
+                fanThread.start();
 
                 // Anima entrada até a fila
                 new Thread(() -> {
@@ -87,7 +94,6 @@ public class SimulationScreen extends JFrame {
 
                 // Cria a thread lógica
                 Fan fan = new Fan(fanCounter++, tempoLanche);
-                fan.start();
 
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Tempo de lanche inválido.");

@@ -1,10 +1,11 @@
+package teste;
 import java.util.concurrent.Semaphore;
 
 public class Teste {
 
     public static Semaphore Display = new Semaphore(0);
     public static Semaphore Mutex = new Semaphore(1);
-    public static Semaphore IsWatching = new Semaphore(0);
+    public static Semaphore IsWatching = new Semaphore(0, true);
     public static Semaphore EnterRoom = new Semaphore(5, true);  // capacidade do auditório
 
     private static int fanCounter = 0;
@@ -24,7 +25,7 @@ public class Teste {
 
         public void displayMovie() {
             System.out.println("[DEMONSTRADOR] Iniciando exibição do filme por " + movieLength + " segundos.");
-
+            int j = 0;
             try {
                 Thread.sleep((long)(movieLength * 1000));
             } catch (InterruptedException e) {
@@ -125,12 +126,6 @@ public class Teste {
                     Display.release();  // ultimo a entrar libera o demonstrador
                 }
                 up();
-
-                try {
-                    IsWatching.acquire();  // aguarda o demonstrador terminar o filme
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
 
                 watchMovie();
                 eat();

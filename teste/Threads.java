@@ -1,9 +1,10 @@
+package teste;
 import java.util.concurrent.Semaphore;
 
 public class Threads {
     public static Semaphore Display = new Semaphore(0);
     public static Semaphore Mutex = new Semaphore(1);
-    public static Semaphore IsWatching = new Semaphore(0);
+    public static Semaphore IsWatching = new Semaphore(0, true);
     public static Semaphore EnterRoom = new Semaphore(5, true);  // semaforo para controlar o numero de pessoas dentro da sala para assistir
 
     private static int fanCounter = 0;

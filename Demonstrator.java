@@ -16,7 +16,7 @@ public class Demonstrator extends Thread {
                 System.out.println("[DEMONSTRADOR] Filme finalizado. Acordando fãs para lanche.");
 
                 for (int i = 0; i < capacity; i++) {
-                    SimulationScreen.IsWatching.release();
+                    SimulationScreen.IsWatching.release(); // serve para deixar os fãs dormindo assim que entram na sala
                 }
 
                 SimulationScreen.EnterRoom.release(capacity);

@@ -2,17 +2,16 @@ import java.awt.*;
 import javax.swing.*;
 
 public class VisualFan extends JLabel {
-
     private static final int SIZE = 32;
 
-    public VisualFan(String name, Color color) {
-        setText(name);
+    public VisualFan(String label, Color color) {
+        setText(label);
         setOpaque(true);
         setBackground(color);
         setHorizontalAlignment(SwingConstants.CENTER);
         setForeground(Color.WHITE);
         setFont(new Font("Arial", Font.BOLD, 10));
-        setBounds(900, 480, SIZE, SIZE); // Entrada inicial
+        setBounds(900, 480, SIZE, SIZE); // ponto inicial (entrada)
     }
 
     public void moveTo(Point target, int steps, int delayMs) {
@@ -32,5 +31,14 @@ public class VisualFan extends JLabel {
         }
 
         SwingUtilities.invokeLater(() -> setLocation(target.x, target.y));
+    }
+
+    public void delayMovementTo(Point target, int steps, int delayMs) {
+        moveTo(target, steps, delayMs);
+        try {
+            Thread.sleep(steps * delayMs);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

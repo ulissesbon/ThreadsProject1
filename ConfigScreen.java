@@ -1,6 +1,6 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import javax.swing.*;
 
 public class ConfigScreen extends JFrame {
 
@@ -8,34 +8,32 @@ public class ConfigScreen extends JFrame {
     private JTextField theatherCapacityField;
 
     public ConfigScreen() {
-        setTitle("Configuração da Simulação");
+        setTitle("Configurações da apresentação");
         setSize(400, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Centraliza a janela
 
-        // === Criação dos componentes ===
-        JLabel movieLenghtLabel = new JLabel("Tempo do Filme (segundos):");
-        JLabel theatherCapacityLabel = new JLabel("Capacidade da Sala:");
+        JLabel movieLenghtLabel = new JLabel("Tempo de Filme (segundos): ");
+        JLabel theatherCapacityLabel = new JLabel("Capacidade da Sala: ");
 
         movieLenghtField = new JTextField(10);
         theatherCapacityField = new JTextField(10);
 
-        JButton iniciarButton = new JButton("Iniciar Simulação");
+        JButton iniciarButton = new JButton("INICIAR");
 
         iniciarButton.addActionListener((ActionEvent e) -> {
             try {
                 int movieLenght = Integer.parseInt(movieLenghtField.getText());
                 int theatherCapacity = Integer.parseInt(theatherCapacityField.getText());
 
-                if (movieLenght <= 0 || theatherCapacity <= 0) {
+                if (movieLenght < 0 || theatherCapacity < 0) {
                     JOptionPane.showMessageDialog(this, "Os valores devem ser maiores que zero.");
                     return;
                 }
 
-                // Abre a tela de simulação (iremos criar depois)
                 SimulationScreen sim = new SimulationScreen(theatherCapacity, movieLenght);
                 sim.setVisible(true);
-                dispose(); // Fecha a tela de configuração
+                dispose();
 
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Insira valores numéricos válidos.");
