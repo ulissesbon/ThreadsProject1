@@ -26,8 +26,12 @@ public class ConfigScreen extends JFrame {
                 int movieLenght = Integer.parseInt(movieLenghtField.getText());
                 int theatherCapacity = Integer.parseInt(theatherCapacityField.getText());
 
-                if (movieLenght < 0 || theatherCapacity < 0) {
+                if (movieLenght <= 0 || theatherCapacity <= 0) {
                     JOptionPane.showMessageDialog(this, "Os valores devem ser maiores que zero.");
+                    return;
+                }
+                if ( theatherCapacity > 10){
+                    JOptionPane.showMessageDialog(this, "A capacidade máxima é 10!");
                     return;
                 }
 

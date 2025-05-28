@@ -1,4 +1,4 @@
-public class Main {
+public class Main1 {
     public static void main(String[] args) {
         Teste.Demonstrator demo = new Teste.Demonstrator(5, 6); // capacidade 5, filme com 6s
         demo.start();

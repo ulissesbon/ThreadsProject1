@@ -18,7 +18,7 @@ public class SimulationScreen extends JFrame {
 
     public SimulationScreen(int capacity, float movieTime) {
         setTitle("Simulação do Cinema");
-        setSize(1000, 650);
+        setSize( 1024, 768);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(null);
@@ -30,7 +30,7 @@ public class SimulationScreen extends JFrame {
 
         // Imagem de fundo
         layeredPane = new JLayeredPane();
-        layeredPane.setBounds(0, 0, 1000, 562);
+        layeredPane.setBounds(0, 0, 1024, 768);
 
         JLabel background = new JLabel(new ImageIcon("background_betav1.png"));
         background.setBounds(0, 0, 1000, 562);
