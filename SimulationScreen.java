@@ -102,7 +102,32 @@ public class SimulationScreen extends JFrame {
                 Fan fan = new Fan(tempoLanche); // completar com seus parâmetros
                 fan.start();
 
-                // TODO: criar VisualFan e adicionar ao layeredPane se estiver implementando animação
+                BufferedImage[][] spriteSet = Math.random() < 0.5 ? maleSprites : femaleSprites;
+
+                int startX = 800;
+                int startY = 550;
+
+                VisualFan visualFan = new VisualFan(spriteSet, startX, startY);
+                layeredPane.add(visualFan, JLayeredPane.PALETTE_LAYER);
+                layeredPane.repaint();
+
+                new Thread(() -> {
+                    visualFan.moveAnimated(600, 550, 2, 20, 30);  // até a fila (para esquerda)
+                    visualFan.moveAnimated(200, 400, 2, 30, 30);  // até a sala
+                    try {
+                        Thread.sleep((long)(movieTime * 1000)); // simula tempo do filme
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                    visualFan.moveAnimated(200, 200, 0, 30, 30);  // saída da sala (para cima)
+                    visualFan.moveAnimated(750, 150, 1, 40, 30);  // até lanchonete
+                    try {
+                        Thread.sleep(tempoLanche * 1000L);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                    visualFan.moveAnimated(600, 550, 3, 30, 30);  // volta para a fila
+                }).start();
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Tempo de lanche inválido.");
             }

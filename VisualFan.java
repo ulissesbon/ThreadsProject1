@@ -1,28 +1,34 @@
-import java.awt.*;
+import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 public class VisualFan extends JLabel {
-    private static final int SIZE = 32;
 
-    public VisualFan(String label, Color color) {
-        setText(label);
-        setOpaque(true);
-        setBackground(color);
-        setHorizontalAlignment(SwingConstants.CENTER);
-        setForeground(Color.WHITE);
-        setFont(new Font("Arial", Font.BOLD, 10));
-        setBounds(900, 480, SIZE, SIZE); // ponto inicial (entrada)
+    private static final int FRAME_WIDTH = 32;  // ou spriteWidth se você preferir dinâmico
+    private static final int FRAME_HEIGHT = 32;
+    private BufferedImage[][] spriteSet;
+    private int rowIndex = 0;
+
+    public VisualFan(BufferedImage[][] spriteSet, int initialX, int initialY) {
+        this.spriteSet = spriteSet;
+        setBounds(initialX, initialY, FRAME_WIDTH, FRAME_HEIGHT);
+        setIcon(new ImageIcon(spriteSet[0][0]));
     }
 
-    public void moveTo(Point target, int steps, int delayMs) {
-        Point current = getLocation();
-        int dx = (target.x - current.x) / steps;
-        int dy = (target.y - current.y) / steps;
+    public void moveAnimated(int targetX, int targetY, int directionRow, int steps, int delayMs) {
+        int dx = (targetX - getX()) / steps;
+        int dy = (targetY - getY()) / steps;
 
         for (int i = 0; i < steps; i++) {
-            final int x = current.x + dx * i;
-            final int y = current.y + dy * i;
-            SwingUtilities.invokeLater(() -> setLocation(x, y));
+            int finalI = i;
+            SwingUtilities.invokeLater(() -> {
+                int x = getX() + dx;
+                int y = getY() + dy;
+                setLocation(x, y);
+
+                int col = finalI % spriteSet[directionRow].length;
+                setIcon(new ImageIcon(spriteSet[directionRow][col]));
+            });
+
             try {
                 Thread.sleep(delayMs);
             } catch (InterruptedException e) {
@@ -30,15 +36,9 @@ public class VisualFan extends JLabel {
             }
         }
 
-        SwingUtilities.invokeLater(() -> setLocation(target.x, target.y));
-    }
-
-    public void delayMovementTo(Point target, int steps, int delayMs) {
-        moveTo(target, steps, delayMs);
-        try {
-            Thread.sleep(steps * delayMs);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        SwingUtilities.invokeLater(() -> {
+            setLocation(targetX, targetY);
+            setIcon(new ImageIcon(spriteSet[directionRow][0])); // parada
+        });
     }
 }
