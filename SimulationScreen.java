@@ -15,6 +15,8 @@ public class SimulationScreen extends JFrame {
 
     private JLayeredPane layeredPane;
     private BufferedImage backgroundImage;
+    private BufferedImage[][] maleSprites;
+    private BufferedImage[][] femaleSprites;
 
     public SimulationScreen(int capacity, float movieTime) {
         setTitle("Simulação do Cinema");
@@ -30,6 +32,25 @@ public class SimulationScreen extends JFrame {
 
         try {
             backgroundImage = ImageIO.read(new File("background_betav1.png"));
+            BufferedImage maleSpriteSheet = ImageIO.read(new File("Male1.png"));
+            BufferedImage femaleSpriteSheet = ImageIO.read(new File("Female1.png"));
+
+            int rows = 12, cols = 8;
+            int spriteWidth = maleSpriteSheet.getWidth() / cols;
+            int spriteHeight = maleSpriteSheet.getHeight() / rows;
+
+            maleSprites = new BufferedImage[rows][cols];
+            for (int y = 0; y < rows; y++)
+                for (int x = 0; x < cols; x++)
+                    maleSprites[y][x] = maleSpriteSheet.getSubimage(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight);
+
+            femaleSprites = new BufferedImage[rows][cols];
+            for (int y = 0; y < rows; y++)
+                for (int x = 0; x < cols; x++)
+                    femaleSprites[y][x] = femaleSpriteSheet.getSubimage(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight);
+
+
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Erro ao carregar imagem de fundo.");
             return;
