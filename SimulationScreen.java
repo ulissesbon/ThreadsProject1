@@ -1,100 +1,87 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.concurrent.Semaphore;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class SimulationScreen extends JFrame {
 
-    public static Semaphore Mutex;
     public static Semaphore Display;
-    public static Semaphore EnterRoom;
+    public static Semaphore Mutex;
     public static Semaphore IsWatching;
-
-    public enum FanStatus { WAITING, WATCHING, EATING }
-
-    private static int fanCounter = 1;  // contagem de fãs começa por 1
+    public static Semaphore EnterRoom;
 
     private JLayeredPane layeredPane;
+    private BufferedImage backgroundImage;
 
     public SimulationScreen(int capacity, float movieTime) {
         setTitle("Simulação do Cinema");
-        setSize( 1024, 768);
+
+        setSize(1280, 960); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(null);
 
         Display = new Semaphore(0);
         Mutex = new Semaphore(1);
-        IsWatching = new Semaphore(0);
+        IsWatching = new Semaphore(0, true);
         EnterRoom = new Semaphore(capacity, true);
 
-        // Imagem de fundo
+        try {
+            backgroundImage = ImageIO.read(new File("background_betav1.png"));
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro ao carregar imagem de fundo.");
+            return;
+        }
+
+        setLayout(new BorderLayout());
+
+        JPanel mainPanel = new JPanel() {
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+
+                int imgW = backgroundImage.getWidth();
+                int imgH = backgroundImage.getHeight();
+
+                int centerX = (getWidth() - imgW) / 2;
+                int centerY = (getHeight() - imgH) / 2;
+
+                g.setColor(Color.BLACK);
+                g.fillRect(0, 0, getWidth(), getHeight());
+
+                g.drawImage(backgroundImage, centerX, centerY, this);
+            }
+        };
+
+        mainPanel.setLayout(null); // para posicionamento absoluto no layeredPane
+        add(mainPanel, BorderLayout.CENTER);
+
         layeredPane = new JLayeredPane();
-        layeredPane.setBounds(0, 0, 1024, 768);
+        layeredPane.setOpaque(false);
+        layeredPane.setBounds(0, 0, backgroundImage.getWidth(), backgroundImage.getHeight());
 
-        JLabel background = new JLabel(new ImageIcon("background_betav1.png"));
-        background.setBounds(0, 0, 1000, 562);
-        layeredPane.add(background, JLayeredPane.DEFAULT_LAYER);
+        layeredPane.setLocation(
+            (getWidth() - backgroundImage.getWidth()) / 2,
+            (getHeight() - backgroundImage.getHeight()) / 2
+        );
 
-        add(layeredPane);
-
-        // Painel inferior de controle
+        mainPanel.add(layeredPane);
         JPanel controlPanel = new JPanel(new FlowLayout());
-        controlPanel.setBounds(0, 562, 1000, 50);
-        controlPanel.setBackground(Color.LIGHT_GRAY);
-
-        layeredPane = new JLayeredPane();
-        layeredPane.setBounds(0, 0, 1000, 562);
-
+        controlPanel.setBackground(Color.DARK_GRAY);
 
         JLabel tempoLancheLabel = new JLabel("Tempo de lanche:");
+        tempoLancheLabel.setForeground(Color.WHITE);
         JTextField tempoLancheField = new JTextField(5);
         JButton adicionarFanButton = new JButton("Adicionar Fã");
 
         adicionarFanButton.addActionListener((ActionEvent e) -> {
             try {
                 int tempoLanche = Integer.parseInt(tempoLancheField.getText());
+                Fan fan = new Fan(tempoLanche); // completar com seus parâmetros
+                fan.start();
 
-                // Cria visual
-                int id = fanCounter++;
-                String label = "F" + id;
-                Color cor = switch (id % 4) {
-                    case 0 -> Color.RED;
-                    case 1 -> Color.GREEN;
-                    case 2 -> Color.BLUE;
-                    default -> Color.YELLOW;
-                };
-
-                VisualFan visual = new VisualFan(label, cor);
-                layeredPane.add(visual, JLayeredPane.PALETTE_LAYER);
-                layeredPane.revalidate();
-                layeredPane.repaint();
-
-                VisualFanThreaded fanThread = new VisualFanThreaded(id, tempoLanche, movieTime, visual, layeredPane);
-                fanThread.start();
-
-                // Anima entrada até a fila
-                new Thread(() -> {
-                    visual.moveTo(new Point(700, 480), 30, 15); // ponto da fila
-                    visual.moveTo(new Point(250, 330), 30, 15); // entrada da sala
-                    try {
-                        Thread.sleep(3000); // simula tempo do filme
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                    visual.moveTo(new Point(250, 170), 30, 15); // saída da sala
-                    visual.moveTo(new Point(800, 100), 30, 15); // lanchonete
-                    try {
-                        Thread.sleep(tempoLanche * 1000L);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                    visual.moveTo(new Point(700, 480), 30, 15); // volta para a fila
-                }).start();
-
-                // Cria a thread lógica
-                Fan fan = new Fan(fanCounter++, tempoLanche);
-
+                // TODO: criar VisualFan e adicionar ao layeredPane se estiver implementando animação
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Tempo de lanche inválido.");
             }
@@ -103,9 +90,8 @@ public class SimulationScreen extends JFrame {
         controlPanel.add(tempoLancheLabel);
         controlPanel.add(tempoLancheField);
         controlPanel.add(adicionarFanButton);
-        add(controlPanel);
 
-        // Inicia o demonstrador com base nos parâmetros passados da tela 1
+        add(controlPanel, BorderLayout.SOUTH);
         Demonstrator demonstrator = new Demonstrator(capacity, movieTime);
         demonstrator.start();
     }

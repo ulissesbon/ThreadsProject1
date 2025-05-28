@@ -1,16 +1,24 @@
 public class Fan extends Thread {
     private int id;
     private int eatingTimer;
-    private SimulationScreen.FanStatus status;
-
-    public Fan(int id, int eatingTime) {
-        this.id = id;
+    private FanStatus status;
+    private static int fanCounter = 1;
+    private static final Object fanId = new Object();
+    
+    public enum FanStatus {
+        WAITING, WATCHING, EATING
+    }
+    
+    public Fan(int eatingTime){
         this.eatingTimer = eatingTime;
+        synchronized (fanId) {
+            this.id = fanCounter++;
+        }
     }
 
     public void run() {
         while (true) {
-            status = SimulationScreen.FanStatus.WAITING;
+            status = FanStatus.WAITING;
             System.out.println("[FAN #" + id + "] status: " + status + " (tentando entrar no auditório)");
 
             try {
@@ -28,7 +36,7 @@ public class Fan extends Thread {
             }
 
             // Fã assiste "dormindo" até ser liberado
-            status = SimulationScreen.FanStatus.WATCHING;
+            status = FanStatus.WATCHING;
             System.out.println("[FAN #" + id + "] sentou na sala e está aguardando o término do filme...");
             try {
                 SimulationScreen.IsWatching.acquire(); // será liberado pelo demonstrador
@@ -38,7 +46,7 @@ public class Fan extends Thread {
 
             System.out.println("[FAN #" + id + "] o filme acabou, indo lanchar.");
 
-            status = SimulationScreen.FanStatus.EATING;
+            status = FanStatus.EATING;
             for (int t = eatingTimer; t > 0; t--) {
                 System.out.println("[FAN #" + id + "] tempo restante de lanche: " + t + "s");
                 try {
