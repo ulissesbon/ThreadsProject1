@@ -31,9 +31,9 @@ public class SimulationScreen extends JFrame {
         EnterRoom = new Semaphore(capacity, true);
 
         try {
-            backgroundImage = ImageIO.read(new File("background_betav1.png"));
-            BufferedImage maleSpriteSheet = ImageIO.read(new File("Male1.png"));
-            BufferedImage femaleSpriteSheet = ImageIO.read(new File("Female1.png"));
+            backgroundImage = ImageIO.read(new File("zbackground_betav1.png"));
+            BufferedImage maleSpriteSheet = ImageIO.read(new File("zMale1.png"));
+            BufferedImage femaleSpriteSheet = ImageIO.read(new File("zFemale1.png"));
 
             int rows = 12, cols = 8;
             int spriteWidth = maleSpriteSheet.getWidth() / cols;
@@ -95,11 +95,12 @@ public class SimulationScreen extends JFrame {
         tempoLancheLabel.setForeground(Color.WHITE);
         JTextField tempoLancheField = new JTextField(5);
         JButton adicionarFanButton = new JButton("Adicionar Fã");
+        tempoLancheField.addActionListener(e -> adicionarFanButton.doClick());
 
         adicionarFanButton.addActionListener((ActionEvent e) -> {
             try {
                 int tempoLanche = Integer.parseInt(tempoLancheField.getText());
-                Fan fan = new Fan(tempoLanche); // completar com seus parâmetros
+                Fan fan = new Fan(tempoLanche); 
                 fan.start();
 
                 BufferedImage[][] spriteSet = Math.random() < 0.5 ? maleSprites : femaleSprites;
@@ -110,24 +111,22 @@ public class SimulationScreen extends JFrame {
                 VisualFan visualFan = new VisualFan(spriteSet, startX, startY);
                 layeredPane.add(visualFan, JLayeredPane.PALETTE_LAYER);
                 layeredPane.repaint();
-
-                new Thread(() -> {
-                    visualFan.moveAnimated(600, 550, 2, 20, 30);  // até a fila (para esquerda)
-                    visualFan.moveAnimated(200, 400, 2, 30, 30);  // até a sala
-                    try {
-                        Thread.sleep((long)(movieTime * 1000)); // simula tempo do filme
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                    visualFan.moveAnimated(200, 200, 0, 30, 30);  // saída da sala (para cima)
-                    visualFan.moveAnimated(750, 150, 1, 40, 30);  // até lanchonete
-                    try {
-                        Thread.sleep(tempoLanche * 1000L);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                    visualFan.moveAnimated(600, 550, 3, 30, 30);  // volta para a fila
-                }).start();
+                
+                visualFan.moveAnimated(600, 550, 2, 20, 40, () -> {
+                    visualFan.moveAnimated(200, 400, 2, 30, 40, () -> {
+                        new Timer((int)(movieTime * 1000), e1 -> {
+                            visualFan.moveAnimated(200, 200, 0, 30, 40, () -> {
+                                visualFan.moveAnimated(750, 150, 1, 40, 40, () -> {
+                                    new Timer(tempoLanche * 1000, e2 -> {
+                                        visualFan.moveAnimated(600, 550, 3, 30, 40, null);
+                                    }).setRepeats(false);
+                                    new Timer(tempoLanche * 1000, null).start();
+                                });
+                            });
+                        }).setRepeats(false);
+                        new Timer((int)(movieTime * 1000), null).start();
+                    });
+                });
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Tempo de lanche inválido.");
             }

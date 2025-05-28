@@ -2,43 +2,44 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 public class VisualFan extends JLabel {
-
-    private static final int FRAME_WIDTH = 32;  // ou spriteWidth se você preferir dinâmico
-    private static final int FRAME_HEIGHT = 32;
     private BufferedImage[][] spriteSet;
-    private int rowIndex = 0;
+    private int spriteIndex = 0;
+    private static final int SPRITE_SIZE = 32;
 
-    public VisualFan(BufferedImage[][] spriteSet, int initialX, int initialY) {
+    public VisualFan(BufferedImage[][] spriteSet, int x, int y) {
         this.spriteSet = spriteSet;
-        setBounds(initialX, initialY, FRAME_WIDTH, FRAME_HEIGHT);
+        setBounds(x, y, SPRITE_SIZE, SPRITE_SIZE);
         setIcon(new ImageIcon(spriteSet[0][0]));
     }
 
-    public void moveAnimated(int targetX, int targetY, int directionRow, int steps, int delayMs) {
-        int dx = (targetX - getX()) / steps;
-        int dy = (targetY - getY()) / steps;
+    public void moveAnimated(int targetX, int targetY, int directionRow, int steps, int delayMs, Runnable onFinish) {
+        int startX = getX();
+        int startY = getY();
+        int dx = (targetX - startX) / steps;
+        int dy = (targetY - startY) / steps;
 
-        for (int i = 0; i < steps; i++) {
-            int finalI = i;
-            SwingUtilities.invokeLater(() -> {
-                int x = getX() + dx;
-                int y = getY() + dy;
-                setLocation(x, y);
+        Timer timer = new Timer(delayMs, null);
+        final int[] step = {0};
 
-                int col = finalI % spriteSet[directionRow].length;
-                setIcon(new ImageIcon(spriteSet[directionRow][col]));
-            });
-
-            try {
-                Thread.sleep(delayMs);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        timer.addActionListener(e -> {
+            if (step[0] >= steps) {
+                ((Timer) e.getSource()).stop();
+                setLocation(targetX, targetY);
+                setIcon(new ImageIcon(spriteSet[directionRow][0])); // parado
+                if (onFinish != null) onFinish.run();
+                return;
             }
-        }
 
-        SwingUtilities.invokeLater(() -> {
-            setLocation(targetX, targetY);
-            setIcon(new ImageIcon(spriteSet[directionRow][0])); // parada
+            int x = getX() + dx;
+            int y = getY() + dy;
+
+            setLocation(x, y);
+            spriteIndex = (spriteIndex + 1) % spriteSet[directionRow].length;
+            setIcon(new ImageIcon(spriteSet[directionRow][spriteIndex]));
+
+            step[0]++;
         });
+
+        timer.start();
     }
 }
