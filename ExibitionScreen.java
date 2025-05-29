@@ -38,18 +38,18 @@ public class ExibitionScreen extends JFrame {
             BufferedImage femaleSpriteSheet = ImageIO.read(new File("zFemale1.png"));
 
             int rows = 12, cols = 8;
-            int spriteWidth = maleSpriteSheet.getWidth() / cols;
-            int spriteHeight = maleSpriteSheet.getHeight() / rows;
+            int spriteWidth = (maleSpriteSheet.getWidth() / cols);
+            int spriteHeight = (maleSpriteSheet.getHeight() / rows) - 5;
 
             maleSprites = new BufferedImage[rows][cols];
             for (int y = 0; y < rows; y++)
                 for (int x = 0; x < cols; x++)
-                    maleSprites[y][x] = maleSpriteSheet.getSubimage(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight);
+                    maleSprites[y][x] = maleSpriteSheet.getSubimage(x , y , spriteWidth, spriteHeight);
 
             femaleSprites = new BufferedImage[rows][cols];
             for (int y = 0; y < rows; y++)
                 for (int x = 0; x < cols; x++)
-                    femaleSprites[y][x] = femaleSpriteSheet.getSubimage(x * spriteWidth, y * spriteHeight, spriteWidth, spriteHeight);
+                    femaleSprites[y][x] = femaleSpriteSheet.getSubimage(x, y, spriteWidth, spriteHeight);
 
 
 
