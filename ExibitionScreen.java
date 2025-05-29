@@ -19,7 +19,7 @@ public class ExibitionScreen extends JFrame {
     private BufferedImage[][] femaleSprites;
 
     public ExibitionScreen(int capacity, float movieTime) {
-        setTitle("Simulação do Cinema");
+        setTitle("EXIBIÇÃO");
 
         setSize(1280, 960); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -58,7 +58,7 @@ public class ExibitionScreen extends JFrame {
 
         setLayout(new BorderLayout());
 
-        JPanel mainPanel = new JPanel() {
+        JPanel mainPanel = new JPanel() {   // centraliza a imagem e deixa o fundo preto
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
 
@@ -96,6 +96,10 @@ public class ExibitionScreen extends JFrame {
         JTextField tempoLancheField = new JTextField(5);
         JButton adicionarFanButton = new JButton("Adicionar Fã");
         tempoLancheField.addActionListener(e -> adicionarFanButton.doClick());
+
+        // demonstrador é criado antes dos fãs
+        Demonstrator demonstrator = new Demonstrator(capacity, movieTime);
+        demonstrator.start();
 
         adicionarFanButton.addActionListener((ActionEvent e) -> {
             try {
@@ -137,7 +141,15 @@ public class ExibitionScreen extends JFrame {
         controlPanel.add(adicionarFanButton);
 
         add(controlPanel, BorderLayout.SOUTH);
-        Demonstrator demonstrator = new Demonstrator(capacity, movieTime);
-        demonstrator.start();
     }
+
+    public static final Point[] ASSENTOS = {
+        // assentos de baixo
+        new Point(112, 207), new Point(178, 207), new Point(244, 207),
+        new Point(310, 207), new Point(376, 207),
+        // assentos de cima
+        new Point(112, 299), new Point(178, 299), new Point(244, 299),
+        new Point(310, 299), new Point(376, 299)
+    };
+
 }
