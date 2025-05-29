@@ -8,23 +8,20 @@ public class ConfigScreen extends JFrame {
     private JTextField capacidadeField;
 
     public ConfigScreen() {
-        setTitle("Configuração da Simulação");
+        setTitle("Configuração Inicial");
         setSize(400, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Centraliza a janela
 
-        // === Criação dos componentes ===
         JLabel tempoFilmeLabel = new JLabel("Tempo do Filme:");
-        JLabel capacidadeLabel = new JLabel("Capacidade da Sala:");
-
         tempoFilmeField = new JTextField(10);
-        capacidadeField = new JTextField(10);
-
-        // Adiciona placeholders
         addPlaceholder(tempoFilmeField, "Ex: 5 (segundos)");
+
+        JLabel capacidadeLabel = new JLabel("Capacidade da Sala:");
+        capacidadeField = new JTextField(10);
         addPlaceholder(capacidadeField, "Máximo: 10");
 
-        JButton iniciarButton = new JButton("Iniciar Simulação");
+        JButton iniciarButton = new JButton("Iniciar");
 
         iniciarButton.addActionListener((ActionEvent e) -> {
             try {
@@ -48,9 +45,9 @@ public class ConfigScreen extends JFrame {
                     return;
                 }
 
-                // Abre a tela de simulação
-                SimulationScreen sim = new SimulationScreen(capacidade, tempoFilme);
-                sim.setVisible(true);
+                // inicia o programa
+                ExibitionScreen exibition = new ExibitionScreen(capacidade, tempoFilme);
+                exibition.setVisible(true);
                 dispose(); // Fecha a tela de configuração
 
             } catch (NumberFormatException ex) {
@@ -74,7 +71,7 @@ public class ConfigScreen extends JFrame {
         getRootPane().setDefaultButton(iniciarButton);
     }
 
-    // Método utilitário para simular placeholder em JTextField
+    // função para adicionar texto dentro da caixa de escrita
     private void addPlaceholder(JTextField field, String placeholder) {
         field.setForeground(Color.GRAY);
         field.setText(placeholder);
