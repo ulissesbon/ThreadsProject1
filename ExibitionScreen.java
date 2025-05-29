@@ -114,7 +114,7 @@ public class ExibitionScreen extends JFrame {
                 int startX = 980;
                 int startY = 550;
 
-                VisualFan visualFan = new VisualFan(spriteSet, startX, startY);
+                VisualFan visualFan = new VisualFan(spriteSet, startX, startY, 2.5);
                 layeredPane.add(visualFan, JLayeredPane.PALETTE_LAYER);
                 layeredPane.repaint();
                 
