@@ -12,6 +12,7 @@ public class ExibitionScreen extends JFrame {
     public static Semaphore Mutex;
     public static Semaphore IsWatching;
     public static Semaphore EnterRoom;
+    public static Semaphore Line;
 
     private JLayeredPane layeredPane;
     private BufferedImage backgroundImage;
@@ -25,6 +26,7 @@ public class ExibitionScreen extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        Display = new Semaphore(0);
         Display = new Semaphore(0);
         Mutex = new Semaphore(1);
         IsWatching = new Semaphore(0, true);
@@ -116,21 +118,9 @@ public class ExibitionScreen extends JFrame {
                 layeredPane.add(visualFan, JLayeredPane.PALETTE_LAYER);
                 layeredPane.repaint();
                 
-                visualFan.moveAnimated(600, 550, 2, 20, 40, () -> {
-                    visualFan.moveAnimated(200, 400, 2, 30, 40, () -> {
-                        new Timer((int)(movieTime * 1000), e1 -> {
-                            visualFan.moveAnimated(200, 200, 0, 30, 40, () -> {
-                                visualFan.moveAnimated(750, 150, 1, 40, 40, () -> {
-                                    new Timer(tempoLanche * 1000, e2 -> {
-                                        visualFan.moveAnimated(600, 550, 3, 30, 40, null);
-                                    }).setRepeats(false);
-                                    new Timer(tempoLanche * 1000, null).start();
-                                });
-                            });
-                        }).setRepeats(false);
-                        new Timer((int)(movieTime * 1000), null).start();
-                    });
-                });
+                int position = fan.getFanId();
+                visualFan.moveAnimated((600 + position * 15), 550, 2, 20, 40);
+                
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Tempo de lanche inválido.");
             }

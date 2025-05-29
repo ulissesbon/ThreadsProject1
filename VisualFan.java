@@ -12,7 +12,7 @@ public class VisualFan extends JLabel {
         setIcon(new ImageIcon(spriteSet[0][0]));
     }
 
-    public void moveAnimated(int targetX, int targetY, int directionRow, int steps, int delayMs, Runnable onFinish) {
+    public void moveAnimated(int targetX, int targetY, int directionRow, int steps, int delayMs) {
         int startX = getX();
         int startY = getY();
         int dx = (targetX - startX) / steps;
@@ -26,7 +26,7 @@ public class VisualFan extends JLabel {
                 ((Timer) e.getSource()).stop();
                 setLocation(targetX, targetY);
                 setIcon(new ImageIcon(spriteSet[directionRow][0])); // parado
-                if (onFinish != null) onFinish.run();
+                
                 return;
             }
 

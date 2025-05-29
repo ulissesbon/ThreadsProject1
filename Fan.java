@@ -8,7 +8,7 @@ public class Fan extends Thread {
     public enum FanStatus {
         WAITING, WATCHING, EATING
     }
-    
+
     public Fan(int eatingTime){
         this.eatingTimer = eatingTime;
         synchronized (fanId) {
@@ -16,6 +16,10 @@ public class Fan extends Thread {
         }
     }
 
+    public int getFanId(){
+        return  this.id;
+    }
+    
     public void run() {
         while (true) {
             status = FanStatus.WAITING;
