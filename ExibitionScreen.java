@@ -112,14 +112,14 @@ public class ExibitionScreen extends JFrame {
                 BufferedImage[][] spriteSet = Math.random() < 0.5 ? maleSprites : femaleSprites;
 
                 int startX = 980;
-                int startY = 550;
+                int startY = 525;
 
                 VisualFan visualFan = new VisualFan(spriteSet, startX, startY, 2.5);
                 layeredPane.add(visualFan, JLayeredPane.PALETTE_LAYER);
                 layeredPane.repaint();
                 
                 int position = fan.getFanId();
-                visualFan.moveAnimated( (550 + position * 20), 550, 2, 20, 40);
+                visualFan.moveAnimated( (510 + position * 30), 500, 2, 20, 40);
 
                 adicionarFanButton.setEnabled(false);   // bloqueio de 1 segundo para criação de novos fãs
                 Timer delayTimer = new Timer(1000, ev -> adicionarFanButton.setEnabled(true));
