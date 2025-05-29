@@ -26,7 +26,7 @@ public class ExibitionScreen extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        Display = new Semaphore(0);
+        Line = new Semaphore(0);
         Display = new Semaphore(0);
         Mutex = new Semaphore(1);
         IsWatching = new Semaphore(0, true);
@@ -111,7 +111,7 @@ public class ExibitionScreen extends JFrame {
 
                 BufferedImage[][] spriteSet = Math.random() < 0.5 ? maleSprites : femaleSprites;
 
-                int startX = 800;
+                int startX = 980;
                 int startY = 550;
 
                 VisualFan visualFan = new VisualFan(spriteSet, startX, startY);
@@ -119,7 +119,12 @@ public class ExibitionScreen extends JFrame {
                 layeredPane.repaint();
                 
                 int position = fan.getFanId();
-                visualFan.moveAnimated((600 + position * 15), 550, 2, 20, 40);
+                visualFan.moveAnimated( (550 + position * 20), 550, 2, 20, 40);
+
+                adicionarFanButton.setEnabled(false);   // bloqueio de 1 segundo para criação de novos fãs
+                Timer delayTimer = new Timer(1000, ev -> adicionarFanButton.setEnabled(true));
+                delayTimer.setRepeats(false);
+                delayTimer.start();
                 
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Tempo de lanche inválido.");
