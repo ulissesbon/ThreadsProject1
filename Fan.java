@@ -22,16 +22,16 @@ public class Fan extends Thread {
             System.out.println("[FAN #" + id + "] status: " + status + " (tentando entrar no auditório)");
 
             try {
-                SimulationScreen.EnterRoom.acquire();
+                ExibitionScreen.EnterRoom.acquire();
                 System.out.println("[FAN #" + id + "] entrou no auditório.");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            synchronized (SimulationScreen.Mutex) {
-                if (SimulationScreen.EnterRoom.availablePermits() == 0) {
+            synchronized (ExibitionScreen.Mutex) {
+                if (ExibitionScreen.EnterRoom.availablePermits() == 0) {
                     System.out.println("[FAN #" + id + "] foi o último a entrar. Liberando o demonstrador.");
-                    SimulationScreen.Display.release();
+                    ExibitionScreen.Display.release();
                 }
             }
 
@@ -39,7 +39,7 @@ public class Fan extends Thread {
             status = FanStatus.WATCHING;
             System.out.println("[FAN #" + id + "] sentou na sala e está aguardando o término do filme...");
             try {
-                SimulationScreen.IsWatching.acquire(); // será liberado pelo demonstrador
+                ExibitionScreen.IsWatching.acquire(); // será liberado pelo demonstrador
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

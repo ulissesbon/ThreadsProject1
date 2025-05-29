@@ -10,16 +10,16 @@ public class Demonstrator extends Thread {
     public void run() {
         while (true) {
             try {
-                SimulationScreen.Display.acquire();
+                ExibitionScreen.Display.acquire();
                 System.out.println("[DEMONSTRADOR] Iniciando exibição do filme por " + movieLength + " segundos.");
                 Thread.sleep((long)(movieLength * 1000));
                 System.out.println("[DEMONSTRADOR] Filme finalizado. Acordando fãs para lanche.");
 
                 for (int i = 0; i < capacity; i++) {
-                    SimulationScreen.IsWatching.release(); // serve para deixar os fãs dormindo assim que entram na sala
+                    ExibitionScreen.IsWatching.release(); // serve para deixar os fãs dormindo assim que entram na sala
                 }
 
-                SimulationScreen.EnterRoom.release(capacity);
+                ExibitionScreen.EnterRoom.release(capacity);
             } catch (Exception e) {
                 e.printStackTrace();
             }

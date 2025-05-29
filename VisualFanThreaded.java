@@ -29,7 +29,7 @@ public class VisualFanThreaded extends Thread {
         while (true) {
             try {
                 log("tentando entrar no auditório...");
-                SimulationScreen.EnterRoom.acquire();
+                ExibitionScreen.EnterRoom.acquire();
 
                 // Movimento até a fila
                 visual.delayMovementTo(new Point(700, 480), 30, 15); // fila
@@ -40,15 +40,15 @@ public class VisualFanThreaded extends Thread {
                 visual.delayMovementTo(new Point(250, 330), 30, 15); // entrada
                 log("entrou na sala.");
 
-                synchronized (SimulationScreen.Mutex) {
-                    if (SimulationScreen.EnterRoom.availablePermits() == 0) {
+                synchronized (ExibitionScreen.Mutex) {
+                    if (ExibitionScreen.EnterRoom.availablePermits() == 0) {
                         log("foi o último a entrar. Liberando o demonstrador.");
-                        SimulationScreen.Display.release();
+                        ExibitionScreen.Display.release();
                     }
                 }
 
                 log("aguardando o início do filme...");
-                SimulationScreen.IsWatching.acquire();
+                ExibitionScreen.IsWatching.acquire();
 
                 status = FanStatus.WATCHING;
                 log("assistindo ao filme. Status: " + status);
