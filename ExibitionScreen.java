@@ -6,7 +6,7 @@ import java.util.concurrent.Semaphore;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-public class SimulationScreen extends JFrame {
+public class ExibitionScreen extends JFrame {
 
     public static Semaphore Display;
     public static Semaphore Mutex;
@@ -18,7 +18,7 @@ public class SimulationScreen extends JFrame {
     private BufferedImage[][] maleSprites;
     private BufferedImage[][] femaleSprites;
 
-    public SimulationScreen(int capacity, float movieTime) {
+    public ExibitionScreen(int capacity, float movieTime) {
         setTitle("Simulação do Cinema");
 
         setSize(1280, 960); 
