@@ -33,7 +33,7 @@ public class ExibitionScreen extends JFrame {
         EnterRoom = new Semaphore(capacity, true);
 
         try {
-            backgroundImage = ImageIO.read(new File("zbackground_betav1.png"));
+            backgroundImage = ImageIO.read(new File("background[1.0].png"));
             BufferedImage maleSpriteSheet = ImageIO.read(new File("zMale1.png"));
             BufferedImage femaleSpriteSheet = ImageIO.read(new File("zFemale1.png"));
 
