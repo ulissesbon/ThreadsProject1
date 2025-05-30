@@ -1,7 +1,9 @@
 import java.awt.Point;
+import java.time.Duration;
+import java.time.LocalTime;
 
 public class Fan extends Thread {
-    private static int fanCounter = 0;
+    private static int fanCounter = 1;
     private static final Object fanIdLock = new Object();
 
     private final int id;
@@ -38,7 +40,7 @@ public class Fan extends Thread {
                 Point assento = ExibitionScreen.seatManager.getSeatPosition(seatIndex);
 
                 visualFan.moveAndWait(assento.x, assento.y, 2, 30, 40); // até o assento
-                System.out.println("[FAN #" + id + "] Sentou no assento " + seatIndex);
+                System.out.println("[FAN #" + id + "] Sentou no assento " + (seatIndex + 1));
 
                 synchronized (ExibitionScreen.Mutex) {
                     if (ExibitionScreen.EnterRoom.availablePermits() == 0) {
@@ -58,9 +60,23 @@ public class Fan extends Thread {
                 visualFan.moveAndWait(750, 150, 1, 40, 40); // até lanche
 
                 status = FanStatus.EATING;
-                for (int t = eatingTimer; t > 0; t--) {
-                    System.out.println("[FAN #" + id + "] Lanchando: " + t + "s restantes");
-                    Thread.sleep(1000);
+
+                LocalTime initial = LocalTime.now();
+                int lastPrintedSecond = -1;
+                while (true) { 
+                    LocalTime now = LocalTime.now();
+                    Duration duration = Duration.between(initial, now);
+                    float length = duration.toMillis() / 1000f;
+
+                    if (length >= eatingTimer) {
+                        break;
+                    }
+                    int currentSecond = (int) length;
+                    if (currentSecond != lastPrintedSecond) {
+                        int remainingTime = eatingTimer - currentSecond;
+                        System.out.println("[FAN #" + id + "] Lanchando: " + remainingTime + "s restantes");
+                        lastPrintedSecond = currentSecond;
+                    }
                 }
 
                 visualFan.moveAndWait(600, 550, 3, 30, 40); // volta à fila

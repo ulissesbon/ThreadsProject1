@@ -44,6 +44,10 @@ public class ConfigScreen extends JFrame {
                     JOptionPane.showMessageDialog(this, "Além da capacidade permitida!");
                     return;
                 }
+                if (tempoFilme > 30) {
+                    JOptionPane.showMessageDialog(this, "Filme muito longo, escolha um tempo menor!");
+                    return;
+                }
 
                 // inicia o programa
                 ExibitionScreen exibition = new ExibitionScreen(capacidade, tempoFilme);

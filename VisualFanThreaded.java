@@ -1,5 +1,8 @@
+package garbage;
 import java.awt.*;
 import javax.swing.*;
+
+import ExibitionScreen;
 
 public class VisualFanThreaded extends Thread {
 

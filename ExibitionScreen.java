@@ -16,9 +16,9 @@ public class ExibitionScreen extends JFrame {
 
     private JLayeredPane layeredPane;
     private BufferedImage backgroundImage;
-    private BufferedImage[][] maleSprites;
-    private BufferedImage[][] femaleSprites;
+    private BufferedImage[][] maleSpritesOriginal;
     private BufferedImage[][] maleSpritesMirrored;
+    private BufferedImage[][] femaleSpritesOriginal;
     private BufferedImage[][] femaleSpritesMirrored;
 
     public static SeatManager seatManager;
@@ -28,7 +28,7 @@ public class ExibitionScreen extends JFrame {
     public ExibitionScreen(int capacity, float movieTime) {
         setTitle("EXIBIÇÃO");
 
-        setSize(1280, 960); 
+        setSize(1280, 960);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -37,87 +37,70 @@ public class ExibitionScreen extends JFrame {
         Mutex = new Semaphore(1);
         IsWatching = new Semaphore(0, true);
         EnterRoom = new Semaphore(capacity, true);
-        
+
         seatManager = new SeatManager(ASSENTOS);
 
         try {
-            backgroundImage = ImageIO.read(new File("background[1.0].png"));
-            BufferedImage maleSpriteSheet = ImageIO.read(new File("zMale1.png"));
-            BufferedImage femaleSpriteSheet = ImageIO.read(new File("zFemale1.png"));
-            BufferedImage maleSpriteSheetMirrored = ImageIO.read(new File("zMaleMirrored.png"));
-            BufferedImage femaleSpriteSheetMirrored = ImageIO.read(new File("zFemaleMirrored.png"));
+            backgroundImage = ImageIO.read(new File("background[1.0].png")); // Assuming the background with cantina is the one to use
 
             int rows = 12, cols = 8;
-            int spriteWidth = (maleSpriteSheet.getWidth() / cols);
-            int spriteHeight = (maleSpriteSheet.getHeight() / rows) - 5;
+            maleSpritesOriginal = VisualFan.loadSpriteSheet("zMale1.png", rows, cols);
+            maleSpritesMirrored = VisualFan.loadSpriteSheet("zMaleMirrored.png", rows, cols);
+            femaleSpritesOriginal = VisualFan.loadSpriteSheet("zFemale1.png", rows, cols);
+            femaleSpritesMirrored = VisualFan.loadSpriteSheet("zFemaleMirrored.png", rows, cols);
 
-            maleSprites = new BufferedImage[rows][cols];
-            for (int y = 0; y < rows; y++)
-                for (int x = 0; x < cols; x++)
-                    maleSprites[y][x] = maleSpriteSheet.getSubimage(x , y , spriteWidth, spriteHeight);
-
-            femaleSprites = new BufferedImage[rows][cols];
-            for (int y = 0; y < rows; y++)
-                for (int x = 0; x < cols; x++)
-                    femaleSprites[y][x] = femaleSpriteSheet.getSubimage(x, y, spriteWidth, spriteHeight);
-
-            maleSpritesMirrored = new BufferedImage[rows][cols];
-            for (int y = 0; y < rows; y++)
-                for (int x = 0; x < cols; x++)
-                    maleSpritesMirrored[y][x] = maleSpriteSheetMirrored.getSubimage(x , y , spriteWidth, spriteHeight);
-
-            femaleSpritesMirrored = new BufferedImage[rows][cols];
-            for (int y = 0; y < rows; y++)
-                for (int x = 0; x < cols; x++)
-                    femaleSpritesMirrored[y][x] = femaleSpriteSheetMirrored.getSubimage(x, y, spriteWidth, spriteHeight);
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Erro ao carregar imagem de fundo.");
+            e.printStackTrace(); // Print error for debugging
+            JOptionPane.showMessageDialog(this, "Erro ao carregar imagem de fundo ou sprites.");
             return;
         }
 
         setLayout(new BorderLayout());
 
-        JPanel mainPanel = new JPanel() {   // centraliza a imagem e deixa o fundo preto
+        JPanel mainPanel = new JPanel() {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-
-                int imgW = backgroundImage.getWidth();
-                int imgH = backgroundImage.getHeight();
-
-                int centerX = (getWidth() - imgW) / 2;
-                int centerY = (getHeight() - imgH) / 2;
-
-                g.setColor(Color.BLACK);
-                g.fillRect(0, 0, getWidth(), getHeight());
-
-                g.drawImage(backgroundImage, centerX, centerY, this);
+                if (backgroundImage != null) {
+                    int imgW = backgroundImage.getWidth();
+                    int imgH = backgroundImage.getHeight();
+                    int centerX = (getWidth() - imgW) / 2;
+                    int centerY = (getHeight() - imgH) / 2;
+                    g.setColor(Color.BLACK);
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                    g.drawImage(backgroundImage, centerX, centerY, this);
+                }
             }
         };
 
-        mainPanel.setLayout(null); // para posicionamento absoluto no layeredPane
+        mainPanel.setLayout(null);
         add(mainPanel, BorderLayout.CENTER);
 
-        layeredPane = new JLayeredPane();
-        layeredPane.setOpaque(false);
-        layeredPane.setBounds(0, 0, backgroundImage.getWidth(), backgroundImage.getHeight());
+        if (backgroundImage != null) {
+            layeredPane = new JLayeredPane();
+            layeredPane.setOpaque(false);
+            int panelWidth = getWidth();
+            int panelHeight = getHeight();
+            int bgImgW = backgroundImage.getWidth();
+            int bgImgH = backgroundImage.getHeight();
+            int offsetX = (panelWidth - bgImgW) / 2;
+            int offsetY = (panelHeight - bgImgH) / 2;
 
-        layeredPane.setLocation(
-            (getWidth() - backgroundImage.getWidth()) / 2,
-            (getHeight() - backgroundImage.getHeight()) / 2
-        );
+            layeredPane.setBounds(offsetX, offsetY, bgImgW, bgImgH);
+            mainPanel.add(layeredPane);
+        }
 
-        mainPanel.add(layeredPane);
+
         JPanel controlPanel = new JPanel(new FlowLayout());
         controlPanel.setBackground(Color.DARK_GRAY);
 
         JLabel tempoLancheLabel = new JLabel("Tempo de lanche:");
         tempoLancheLabel.setForeground(Color.WHITE);
-        JTextField tempoLancheField = new JTextField(5);
+        JTextField tempoLancheField = new JTextField("5", 5);
         JButton adicionarFanButton = new JButton("Adicionar Fã");
         tempoLancheField.addActionListener(e -> adicionarFanButton.doClick());
 
-        // demonstrador é criado antes dos fãs
+
         Demonstrator demonstrator = new Demonstrator(capacity, movieTime);
         demonstrator.start();
 
@@ -127,33 +110,52 @@ public class ExibitionScreen extends JFrame {
                     JOptionPane.showMessageDialog(this, "Limite de 10 fãs atingido.");
                     return;
                 }
+
+                int tempoLanche;
+                try {
+                    tempoLanche = Integer.parseInt(tempoLancheField.getText());
+                    if (tempoLanche <= 0) {
+                        JOptionPane.showMessageDialog(this, "Tempo de lanche deve ser positivo.");
+                        return;
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Tempo de lanche inválido.");
+                    return;
+                }
+
                 fanCount++;
-
-                int tempoLanche = Integer.parseInt(tempoLancheField.getText());
-
                 Line.release();
 
-                BufferedImage[][] spriteSet = Math.random() < 0.5 ? maleSprites : femaleSprites;
-                VisualFan visualFan = new VisualFan(spriteSet, 980, 500, 2.5);
-                layeredPane.add(visualFan, JLayeredPane.PALETTE_LAYER);
-                layeredPane.repaint();
+                BufferedImage[][] originalSprites;
+                BufferedImage[][] mirroredSprites;
+                if (Math.random() < 0.5) {
+                    originalSprites = maleSpritesOriginal;
+                    mirroredSprites = maleSpritesMirrored;
+                } else {
+                    originalSprites = femaleSpritesOriginal;
+                    mirroredSprites = femaleSpritesMirrored;
+                }
 
-                // Criar e iniciar thread Fan
+                VisualFan visualFan = new VisualFan(originalSprites, mirroredSprites, 980, 500, 2.5);
+                if (layeredPane != null) {
+                    layeredPane.add(visualFan, JLayeredPane.PALETTE_LAYER);
+                    layeredPane.repaint();
+                }
+
                 Fan fan = new Fan(tempoLanche, visualFan);
                 fan.start();
-                
-                visualFan.moveAnimated( (510 + fanCount * 35), 500, 2, 20, 40, null);
 
-                adicionarFanButton.setEnabled(false);   // bloqueio de 1 segundo para criação de novos fãs
-                Timer delayTimer = new Timer(1000, ev -> adicionarFanButton.setEnabled(true));
+                // Initial animation to a starting point in the line
+                visualFan.moveAnimated( (510 + (fanCount-1) * 35), 500, 2, 20, 40, null);
+
+                adicionarFanButton.setEnabled(false);
+                Timer delayTimer = new Timer(950, ev -> adicionarFanButton.setEnabled(true));
                 delayTimer.setRepeats(false);
                 delayTimer.start();
 
-                // SENTAR NOS ASSENTOS
-                // IR COMER E VOLTAR PRA FILA
-                
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Tempo de lanche inválido.");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Erro ao adicionar fã: " + ex.getMessage());
             }
         });
 
@@ -162,15 +164,34 @@ public class ExibitionScreen extends JFrame {
         controlPanel.add(adicionarFanButton);
 
         add(controlPanel, BorderLayout.SOUTH);
+
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                if (layeredPane != null && backgroundImage != null) {
+                    int panelWidth = mainPanel.getWidth();
+                    int panelHeight = mainPanel.getHeight();
+                    int bgImgW = backgroundImage.getWidth();
+                    int bgImgH = backgroundImage.getHeight();
+                    int offsetX = (panelWidth - bgImgW) / 2;
+                    int offsetY = (panelHeight - bgImgH) / 2;
+                    layeredPane.setBounds(offsetX, offsetY, bgImgW, bgImgH);
+                }
+            }
+        });
     }
 
     public static final Point[] ASSENTOS = {
-        // assentos de baixo
-        new Point(112, 207), new Point(178, 207), new Point(244, 207),
-        new Point(310, 207), new Point(376, 207),
-        // assentos de cima
-        new Point(112, 299), new Point(178, 299), new Point(244, 299),
-        new Point(310, 299), new Point(376, 299)
+        new Point(95, 435), new Point(161, 435), new Point(227, 435),
+        new Point(296, 435), new Point(363, 435),
+        new Point(95, 290), new Point(161, 290), new Point(227, 290),
+        new Point(296, 290), new Point(363, 290)
+        
     };
 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            ConfigScreen configScreen = new ConfigScreen();
+            configScreen.setVisible(true);
+        });
+    }
 }
