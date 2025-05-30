@@ -130,7 +130,7 @@ public class ExibitionScreen extends JFrame {
                 Fan fan = new Fan(tempoLanche, visualFan);
                 fan.start();
                 
-                visualFan.moveAnimated( (510 + fanCount * 35), 500, 2, 20, 40, fan);
+                visualFan.moveAnimated( (510 + fanCount * 35), 500, 2, 20, 40, null);
 
                 adicionarFanButton.setEnabled(false);   // bloqueio de 1 segundo para criação de novos fãs
                 Timer delayTimer = new Timer(1000, ev -> adicionarFanButton.setEnabled(true));

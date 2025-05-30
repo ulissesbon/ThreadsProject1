@@ -38,6 +38,10 @@ public class VisualFan extends JLabel {
                 setLocation(targetX, targetY);
                 BufferedImage stoppedSprite = resizeSprite(spriteSet[directionRow][0]);
                 setIcon(new ImageIcon(stoppedSprite));
+
+                if (onFinish != null) {
+                    onFinish.run();
+                }
                 return;
             }
 
@@ -72,14 +76,14 @@ public class VisualFan extends JLabel {
     public void moveAndWait(int targetX, int targetY, int directionRow, int steps, int delayMs) {
         final Object lock = new Object();
 
-        Runnable onFinish = () -> {
+        Runnable onFinishLocal = () -> {
             synchronized (lock) {
                 lock.notify(); // acorda a thread
             }
         };
 
         synchronized (lock) {
-            moveAnimated(targetX, targetY, directionRow, steps, delayMs, onFinish);
+            moveAnimated(targetX, targetY, directionRow, steps, delayMs, onFinishLocal);
             try {
                 lock.wait(); // bloqueia até a animação terminar
             } catch (InterruptedException e) {
