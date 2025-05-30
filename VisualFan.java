@@ -23,7 +23,7 @@ public class VisualFan extends JLabel {
         setIcon(new ImageIcon(resized));
     }
 
-    public void moveAnimated(int targetX, int targetY, int directionRow, int steps, int delayMs) {
+    public void moveAnimated(int targetX, int targetY, int directionRow, int steps, int delayMs, Runnable onFinish) {
         int startX = getX();
         int startY = getY();
         int dx = (targetX - startX) / steps;

@@ -1,3 +1,5 @@
+import java.awt.Point;
+
 public class Fan extends Thread {
     private static int fanCounter = 0;
     private static final Object fanIdLock = new Object();
@@ -30,26 +32,26 @@ public class Fan extends Thread {
                 System.out.println("[FAN #" + id + "] Tentando entrar na sala...");
                 visualFan.moveAndWait(600, 550, 2, 25, 40); // até fila
 
-                SimulationScreen.EnterRoom.acquire();
+                ExibitionScreen.EnterRoom.acquire();
 
-                seatIndex = SimulationScreen.seatManager.assignSeat();
-                Point assento = SimulationScreen.seatManager.getSeatPosition(seatIndex);
+                seatIndex = ExibitionScreen.seatManager.assignSeat();
+                Point assento = ExibitionScreen.seatManager.getSeatPosition(seatIndex);
 
                 visualFan.moveAndWait(assento.x, assento.y, 2, 30, 40); // até o assento
                 System.out.println("[FAN #" + id + "] Sentou no assento " + seatIndex);
 
-                synchronized (SimulationScreen.Mutex) {
-                    if (SimulationScreen.EnterRoom.availablePermits() == 0) {
-                        SimulationScreen.Display.release();
+                synchronized (ExibitionScreen.Mutex) {
+                    if (ExibitionScreen.EnterRoom.availablePermits() == 0) {
+                        ExibitionScreen.Display.release();
                         System.out.println("[FAN #" + id + "] Último da sala. Iniciando filme.");
                     }
                 }
 
                 status = FanStatus.WATCHING;
-                SimulationScreen.IsWatching.acquire(); // bloqueia até o filme acabar
+                ExibitionScreen.IsWatching.acquire(); // bloqueia até o filme acabar
 
                 // Após filme, libera o assento e vai lanchar
-                SimulationScreen.seatManager.releaseSeat(seatIndex);
+                ExibitionScreen.seatManager.releaseSeat(seatIndex);
                 seatIndex = -1;
 
                 visualFan.moveAndWait(200, 200, 0, 30, 40); // sai da sala

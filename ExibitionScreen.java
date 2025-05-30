@@ -19,6 +19,8 @@ public class ExibitionScreen extends JFrame {
     private BufferedImage[][] maleSprites;
     private BufferedImage[][] femaleSprites;
 
+    public static SeatManager seatManager;
+
     private int fanCount = 0;
 
     public ExibitionScreen(int capacity, float movieTime) {
@@ -33,6 +35,8 @@ public class ExibitionScreen extends JFrame {
         Mutex = new Semaphore(1);
         IsWatching = new Semaphore(0, true);
         EnterRoom = new Semaphore(capacity, true);
+        
+        seatManager = new SeatManager(ASSENTOS);
 
         try {
             backgroundImage = ImageIO.read(new File("background[1.0].png"));
@@ -126,7 +130,7 @@ public class ExibitionScreen extends JFrame {
                 Fan fan = new Fan(tempoLanche, visualFan);
                 fan.start();
                 
-                visualFan.moveAnimated( (510 + fanCount * 35), 500, 2, 20, 40);
+                visualFan.moveAnimated( (510 + fanCount * 35), 500, 2, 20, 40, fan);
 
                 adicionarFanButton.setEnabled(false);   // bloqueio de 1 segundo para criação de novos fãs
                 Timer delayTimer = new Timer(1000, ev -> adicionarFanButton.setEnabled(true));
