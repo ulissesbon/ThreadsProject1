@@ -32,8 +32,8 @@ public class Fan extends Thread {
             try {
                 status = FanStatus.WAITING;
                 System.out.println("[FAN #" + id + "] Tentando entrar na sala...");
-                visualFan.moveAndWait(600, 550, 2, 25, 40); // até fila
-
+                visualFan.moveAndWait( (510 + (id - 1) * 35), 500, 2, 20, 40);
+                
                 ExibitionScreen.EnterRoom.acquire();
 
                 seatIndex = ExibitionScreen.seatManager.assignSeat();
@@ -53,13 +53,15 @@ public class Fan extends Thread {
                 ExibitionScreen.IsWatching.acquire(); // bloqueia até o filme acabar
 
                 // Após filme, libera o assento e vai lanchar
-                ExibitionScreen.seatManager.releaseSeat(seatIndex);
-                seatIndex = -1;
+                
 
                 visualFan.moveAndWait(200, 200, 0, 30, 40); // sai da sala
                 visualFan.moveAndWait(750, 150, 1, 40, 40); // até lanche
 
                 status = FanStatus.EATING;
+
+                ExibitionScreen.seatManager.releaseSeat(seatIndex);
+                seatIndex = -1;
 
                 LocalTime initial = LocalTime.now();
                 int lastPrintedSecond = -1;
@@ -79,7 +81,7 @@ public class Fan extends Thread {
                     }
                 }
 
-                visualFan.moveAndWait(600, 550, 3, 30, 40); // volta à fila
+                visualFan.moveAndWait( (510 + (id - 1) * 35), 500, 2, 20, 40);
                 System.out.println("[FAN #" + id + "] Retornou à fila.");
             } catch (InterruptedException e) {
                 e.printStackTrace();
