@@ -18,6 +18,8 @@ public class ExibitionScreen extends JFrame {
     private BufferedImage backgroundImage;
     private BufferedImage[][] maleSprites;
     private BufferedImage[][] femaleSprites;
+    private BufferedImage[][] maleSpritesMirrored;
+    private BufferedImage[][] femaleSpritesMirrored;
 
     public static SeatManager seatManager;
 
@@ -42,6 +44,8 @@ public class ExibitionScreen extends JFrame {
             backgroundImage = ImageIO.read(new File("background[1.0].png"));
             BufferedImage maleSpriteSheet = ImageIO.read(new File("zMale1.png"));
             BufferedImage femaleSpriteSheet = ImageIO.read(new File("zFemale1.png"));
+            BufferedImage maleSpriteSheetMirrored = ImageIO.read(new File("zMaleMirrored.png"));
+            BufferedImage femaleSpriteSheetMirrored = ImageIO.read(new File("zFemaleMirrored.png"));
 
             int rows = 12, cols = 8;
             int spriteWidth = (maleSpriteSheet.getWidth() / cols);
@@ -57,7 +61,15 @@ public class ExibitionScreen extends JFrame {
                 for (int x = 0; x < cols; x++)
                     femaleSprites[y][x] = femaleSpriteSheet.getSubimage(x, y, spriteWidth, spriteHeight);
 
+            maleSpritesMirrored = new BufferedImage[rows][cols];
+            for (int y = 0; y < rows; y++)
+                for (int x = 0; x < cols; x++)
+                    maleSpritesMirrored[y][x] = maleSpriteSheetMirrored.getSubimage(x , y , spriteWidth, spriteHeight);
 
+            femaleSpritesMirrored = new BufferedImage[rows][cols];
+            for (int y = 0; y < rows; y++)
+                for (int x = 0; x < cols; x++)
+                    femaleSpritesMirrored[y][x] = femaleSpriteSheetMirrored.getSubimage(x, y, spriteWidth, spriteHeight);
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Erro ao carregar imagem de fundo.");
