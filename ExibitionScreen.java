@@ -125,6 +125,10 @@ public class ExibitionScreen extends JFrame {
                 Timer delayTimer = new Timer(1000, ev -> adicionarFanButton.setEnabled(true));
                 delayTimer.setRepeats(false);
                 delayTimer.start();
+
+                // TODO LIMITAR O NUMERO MAXIMO DE FANS
+                // SENTAR NOS ASSENTOS
+                // IR COMER E VOLTAR PRA FILA
                 
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Tempo de lanche inválido.");
