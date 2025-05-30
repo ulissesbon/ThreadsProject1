@@ -68,4 +68,24 @@ public class VisualFan extends JLabel {
 
         return resized;
     }
+
+    public void moveAndWait(int targetX, int targetY, int directionRow, int steps, int delayMs) {
+        final Object lock = new Object();
+
+        Runnable onFinish = () -> {
+            synchronized (lock) {
+                lock.notify(); // acorda a thread
+            }
+        };
+
+        synchronized (lock) {
+            moveAnimated(targetX, targetY, directionRow, steps, delayMs, onFinish);
+            try {
+                lock.wait(); // bloqueia até a animação terminar
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

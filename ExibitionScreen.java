@@ -19,6 +19,8 @@ public class ExibitionScreen extends JFrame {
     private BufferedImage[][] maleSprites;
     private BufferedImage[][] femaleSprites;
 
+    private int fanCount = 0;
+
     public ExibitionScreen(int capacity, float movieTime) {
         setTitle("EXIBIÇÃO");
 
@@ -26,7 +28,7 @@ public class ExibitionScreen extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        Line = new Semaphore(0);
+        Line = new Semaphore(0, true);
         Display = new Semaphore(0);
         Mutex = new Semaphore(1);
         IsWatching = new Semaphore(0, true);
@@ -105,28 +107,32 @@ public class ExibitionScreen extends JFrame {
 
         adicionarFanButton.addActionListener((ActionEvent e) -> {
             try {
+                if (fanCount >= 10) {
+                    JOptionPane.showMessageDialog(this, "Limite de 10 fãs atingido.");
+                    return;
+                }
+                fanCount++;
+
                 int tempoLanche = Integer.parseInt(tempoLancheField.getText());
-                Fan fan = new Fan(tempoLanche); 
-                fan.start();
+
+                Line.release();
 
                 BufferedImage[][] spriteSet = Math.random() < 0.5 ? maleSprites : femaleSprites;
-
-                int startX = 980;
-                int startY = 500;
-
-                VisualFan visualFan = new VisualFan(spriteSet, startX, startY, 2.5);
+                VisualFan visualFan = new VisualFan(spriteSet, 980, 500, 2.5);
                 layeredPane.add(visualFan, JLayeredPane.PALETTE_LAYER);
                 layeredPane.repaint();
+
+                // Criar e iniciar thread Fan
+                Fan fan = new Fan(tempoLanche, visualFan);
+                fan.start();
                 
-                int position = fan.getFanId();
-                visualFan.moveAnimated( (510 + position * 35), 500, 2, 20, 40);
+                visualFan.moveAnimated( (510 + fanCount * 35), 500, 2, 20, 40);
 
                 adicionarFanButton.setEnabled(false);   // bloqueio de 1 segundo para criação de novos fãs
                 Timer delayTimer = new Timer(1000, ev -> adicionarFanButton.setEnabled(true));
                 delayTimer.setRepeats(false);
                 delayTimer.start();
 
-                // TODO LIMITAR O NUMERO MAXIMO DE FANS
                 // SENTAR NOS ASSENTOS
                 // IR COMER E VOLTAR PRA FILA
                 

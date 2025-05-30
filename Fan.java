@@ -1,66 +1,71 @@
 public class Fan extends Thread {
-    private int id;
-    private int eatingTimer;
-    private FanStatus status;
-    private static int fanCounter = 1;
-    private static final Object fanId = new Object();
-    
-    public enum FanStatus {
-        WAITING, WATCHING, EATING
-    }
+    private static int fanCounter = 0;
+    private static final Object fanIdLock = new Object();
 
-    public Fan(int eatingTime){
+    private final int id;
+    private final int eatingTimer;
+    private VisualFan visualFan;
+
+    public enum FanStatus { WAITING, WATCHING, EATING }
+
+    private FanStatus status;
+    private int seatIndex;
+
+    public Fan(int eatingTime, VisualFan visualFan) {
         this.eatingTimer = eatingTime;
-        synchronized (fanId) {
+        this.visualFan = visualFan;
+        synchronized (fanIdLock) {
             this.id = fanCounter++;
         }
     }
 
-    public int getFanId(){
-        return  this.id;
+    public int getIdNum() {
+        return this.id;
     }
-    
+
     public void run() {
         while (true) {
-            status = FanStatus.WAITING;
-            System.out.println("[FAN #" + id + "] status: " + status + " (tentando entrar no auditório)");
-
             try {
-                ExibitionScreen.EnterRoom.acquire();
-                System.out.println("[FAN #" + id + "] entrou no auditório.");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                status = FanStatus.WAITING;
+                System.out.println("[FAN #" + id + "] Tentando entrar na sala...");
+                visualFan.moveAndWait(600, 550, 2, 25, 40); // até fila
 
-            synchronized (ExibitionScreen.Mutex) {
-                if (ExibitionScreen.EnterRoom.availablePermits() == 0) {
-                    System.out.println("[FAN #" + id + "] foi o último a entrar. Liberando o demonstrador.");
-                    ExibitionScreen.Display.release();
+                SimulationScreen.EnterRoom.acquire();
+
+                seatIndex = SimulationScreen.seatManager.assignSeat();
+                Point assento = SimulationScreen.seatManager.getSeatPosition(seatIndex);
+
+                visualFan.moveAndWait(assento.x, assento.y, 2, 30, 40); // até o assento
+                System.out.println("[FAN #" + id + "] Sentou no assento " + seatIndex);
+
+                synchronized (SimulationScreen.Mutex) {
+                    if (SimulationScreen.EnterRoom.availablePermits() == 0) {
+                        SimulationScreen.Display.release();
+                        System.out.println("[FAN #" + id + "] Último da sala. Iniciando filme.");
+                    }
                 }
-            }
 
-            // Fã assiste "dormindo" até ser liberado
-            status = FanStatus.WATCHING;
-            System.out.println("[FAN #" + id + "] sentou na sala e está aguardando o término do filme...");
-            try {
-                ExibitionScreen.IsWatching.acquire(); // será liberado pelo demonstrador
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                status = FanStatus.WATCHING;
+                SimulationScreen.IsWatching.acquire(); // bloqueia até o filme acabar
 
-            System.out.println("[FAN #" + id + "] o filme acabou, indo lanchar.");
+                // Após filme, libera o assento e vai lanchar
+                SimulationScreen.seatManager.releaseSeat(seatIndex);
+                seatIndex = -1;
 
-            status = FanStatus.EATING;
-            for (int t = eatingTimer; t > 0; t--) {
-                System.out.println("[FAN #" + id + "] tempo restante de lanche: " + t + "s");
-                try {
+                visualFan.moveAndWait(200, 200, 0, 30, 40); // sai da sala
+                visualFan.moveAndWait(750, 150, 1, 40, 40); // até lanche
+
+                status = FanStatus.EATING;
+                for (int t = eatingTimer; t > 0; t--) {
+                    System.out.println("[FAN #" + id + "] Lanchando: " + t + "s restantes");
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
-            }
 
-            System.out.println("[FAN #" + id + "] terminou de lanchar, voltando para a fila.");
+                visualFan.moveAndWait(600, 550, 3, 30, 40); // volta à fila
+                System.out.println("[FAN #" + id + "] Retornou à fila.");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
