@@ -69,6 +69,16 @@ public class ExibitionScreen extends JFrame {
                     g.setColor(Color.BLACK);
                     g.fillRect(0, 0, getWidth(), getHeight());
                     g.drawImage(backgroundImage, centerX, centerY, this);
+
+                    // debug visual
+                    g.setColor(Color.RED);
+                    for (int x = 0; x <= imgW; x += 25) {
+                        for (int y = 0; y <= imgH; y += 25) {
+                            int px = centerX + x;
+                            int py = centerY + y;
+                            g.fillOval(px - 2, py - 2, 5, 5);
+                        }
+                    }
                 }
             }
         };
