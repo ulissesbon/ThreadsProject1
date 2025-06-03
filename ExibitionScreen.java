@@ -191,17 +191,11 @@ public class ExibitionScreen extends JFrame {
     }
 
     public static final Point[] ASSENTOS = {
-        new Point(95, 435), new Point(161, 435), new Point(227, 435),
+        new Point(95, 435),  new Point(161, 435), new Point(227, 435),
         new Point(296, 435), new Point(363, 435),
-        new Point(95, 290), new Point(161, 290), new Point(227, 290),
+        new Point(95, 290),  new Point(161, 290), new Point(227, 290),
         new Point(296, 290), new Point(363, 290)
         
     };
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            ConfigScreen configScreen = new ConfigScreen();
-            configScreen.setVisible(true);
-        });
-    }
 }
