@@ -24,7 +24,7 @@ public class ExibitionScreen extends JFrame {
 
     private int fanCount = 0;
 
-    public ExibitionScreen(int capacity, float movieTime) {
+    public ExibitionScreen(int capacity, int movieTime) {
         setTitle("EXIBIÇÃO");
 
         setSize(1280, 960);
