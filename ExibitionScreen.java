@@ -8,10 +8,9 @@ import javax.swing.*;
 
 public class ExibitionScreen extends JFrame {
 
-    public static Semaphore Display;
+    
     public static Semaphore Mutex;
     public static Semaphore IsWatching;
-    public static Semaphore EnterRoom;
     public static Semaphore Line;
 
     private JLayeredPane layeredPane;
@@ -33,10 +32,9 @@ public class ExibitionScreen extends JFrame {
         setLocationRelativeTo(null);
 
         Line = new Semaphore(0, true);
-        Display = new Semaphore(0);
+        
         Mutex = new Semaphore(1);
         IsWatching = new Semaphore(0, true);
-        EnterRoom = new Semaphore(capacity, true);
 
         seatManager = new SeatManager(ASSENTOS);
 
@@ -134,7 +132,6 @@ public class ExibitionScreen extends JFrame {
                 }
 
                 fanCount++;
-                Line.release();
 
                 BufferedImage[][] originalSprites;
                 BufferedImage[][] mirroredSprites;
@@ -146,7 +143,7 @@ public class ExibitionScreen extends JFrame {
                     mirroredSprites = femaleSpritesMirrored;
                 }
 
-                VisualFan visualFan = new VisualFan(originalSprites, mirroredSprites, 980, 500, 2.5);
+                Fan fan = new Fan(tempoLanche);
                 if (layeredPane != null) {
                     layeredPane.add(visualFan, JLayeredPane.PALETTE_LAYER);
                     layeredPane.repaint();
@@ -155,8 +152,7 @@ public class ExibitionScreen extends JFrame {
                 Fan fan = new Fan(tempoLanche, visualFan);
                 fan.start();
 
-                // Initial animation to a starting point in the line
-                visualFan.moveAnimated( (510 + (fanCount-1) * 35), 500, 2, 20, 40, null);
+                // TODO movimentação até a fila
 
                 adicionarFanButton.setEnabled(false);
                 Timer delayTimer = new Timer(950, ev -> adicionarFanButton.setEnabled(true));

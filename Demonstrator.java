@@ -1,47 +1,72 @@
 
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.concurrent.Semaphore;
 
 public class Demonstrator extends Thread {
     private int capacity;
-    private float movieLength;
+    private int movieLength;
 
-    public Demonstrator(int capacity, float movieLength){
+    public static Semaphore EnterRoom;
+    public static Semaphore Display;
+
+    public Demonstrator(int capacity, int  movieLength){
         this.capacity = capacity;
         this.movieLength = movieLength;
+        
+        EnterRoom = new Semaphore(capacity, true);
+        Display = new Semaphore(0);
+    }
+
+    public void displayMovie() {
+        System.out.println("[DEMONSTRADOR] Iniciando exibição do filme. ");
+                
+        LocalTime initial = LocalTime.now();
+        int lastPrintedSecond = -1;
+        while (true) { // função para rodar o filme por X segundos
+            LocalTime now = LocalTime.now();
+            Duration duration = Duration.between(initial, now);
+            float length = duration.toMillis() / 1000f;
+
+            if(length >= (float) movieLength){
+                break;
+            }
+            int currentSecond = (int) length;
+            if (currentSecond != lastPrintedSecond) {
+                int remainingTime = movieLength - currentSecond;
+                System.out.println("[DEMONSTRADOR] Exibindo filme: " + remainingTime + "s restantes");
+                lastPrintedSecond = currentSecond;
+            }
+        }
+    }
+
+    private void releasingFans() {
+        for (int i = 0; i < capacity; i++) {
+            ExibitionScreen.IsWatching.release(); // libera os fãs dormindo quando acaba o filme
+            
+            LocalTime initial = LocalTime.now();
+            while (true) {
+                LocalTime now = LocalTime.now();
+                Duration duration = Duration.between(initial, now);
+                float length = duration.toMillis() / 1000f;
+                if(length >= 0.5){
+                    break;
+                }
+            }
+        }
     }
 
     public void run() {
         while (true) {
             try {
-                ExibitionScreen.Display.acquire();
-                System.out.println("[DEMONSTRADOR] Iniciando exibição do filme por " + movieLength + " segundos.");
+                Display.acquire();  // bloqueado até todos entrarem
+                displayMovie();
                 
-                LocalTime initial = LocalTime.now();
-                int lastPrintedSecond = -1;
-                while (true) { 
-                    LocalTime now = LocalTime.now();
-                    Duration duration = Duration.between(initial, now);
-                    float length = duration.toMillis() / 1000f;
+                System.out.println("[DEMONSTRADOR] Filme finalizado. Liberando fãs para lanche.");
 
-                    if(length >= movieLength){
-                        break;
-                    }
-                    int currentSecond = (int) length;
-                    if (currentSecond != lastPrintedSecond) {
-                        int remainingTime = (int) movieLength - currentSecond;
-                        System.out.println("[DEMONSTRADOR] Exibindo filme: " + remainingTime + "s restantes");
-                        lastPrintedSecond = currentSecond;
-                    }
-                }
-                
-                System.out.println("[DEMONSTRADOR] Filme finalizado. Acordando fãs para lanche.");
+                releasingFans();
+                EnterRoom.release(capacity);
 
-                for (int i = 0; i < capacity; i++) {
-                    ExibitionScreen.IsWatching.release(); // serve para deixar os fãs dormindo assim que entram na sala
-                }
-
-                ExibitionScreen.EnterRoom.release(capacity);
             } catch (Exception e) {
                 e.printStackTrace();
             }

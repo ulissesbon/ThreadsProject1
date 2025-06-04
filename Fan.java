@@ -8,16 +8,14 @@ public class Fan extends Thread {
 
     private final int id;
     private final int eatingTimer;
-    private VisualFan visualFan;
 
     public enum FanStatus { WAITING, WATCHING, EATING }
 
     private FanStatus status;
     private int seatIndex;
 
-    public Fan(int eatingTime, VisualFan visualFan) {
+    public Fan(int eatingTime) {
         this.eatingTimer = eatingTime;
-        this.visualFan = visualFan;
         synchronized (fanIdLock) {
             this.id = fanCounter++;
         }
@@ -26,63 +24,77 @@ public class Fan extends Thread {
     public int getIdNum() {
         return this.id;
     }
+    
+    public void down(){
+        try {
+            ExibitionScreen.Mutex.acquire();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void up(){
+        ExibitionScreen.Mutex.release();
+    }
+
+    public void eating(){
+        // função para deixar o fã lanchando pelo tempo determinado
+        LocalTime initial = LocalTime.now();
+        int lastPrintedSecond = -1;
+        while (true) { 
+            LocalTime now = LocalTime.now();
+            Duration duration = Duration.between(initial, now);
+            float length = duration.toMillis() / 1000f;
+
+            if (length >= (float) this.eatingTimer) {
+                break;
+            }
+
+            int currentSecond = (int) length;
+            if (currentSecond != lastPrintedSecond) {
+                int remainingTime = this.eatingTimer - currentSecond;
+                System.out.println("[FAN #" + id + "] Lanchando: " + remainingTime + "s restantes");
+                lastPrintedSecond = currentSecond;
+            }
+        }
+    }
 
     public void run() {
         while (true) {
             try {
                 status = FanStatus.WAITING;
                 System.out.println("[FAN #" + id + "] Tentando entrar na sala...");
-                visualFan.moveAndWait( (510 + (id - 1) * 35), 500, 2, 20, 40);
                 
-                ExibitionScreen.EnterRoom.acquire();
+                down();
+                Demonstrator.EnterRoom.acquire();
+                up();
 
                 seatIndex = ExibitionScreen.seatManager.assignSeat();
                 Point assento = ExibitionScreen.seatManager.getSeatPosition(seatIndex);
 
-                visualFan.moveAndWait(assento.x, assento.y, 2, 30, 40); // até o assento
                 System.out.println("[FAN #" + id + "] Sentou no assento " + (seatIndex + 1));
 
-                synchronized (ExibitionScreen.Mutex) {
-                    if (ExibitionScreen.EnterRoom.availablePermits() == 0) {
-                        ExibitionScreen.Display.release();
-                        System.out.println("[FAN #" + id + "] Último da sala. Iniciando filme.");
-                    }
+                down();
+                if (Demonstrator.EnterRoom.availablePermits() == 0) {
+                    System.out.println("[FAN #" + id + "] Último da sala. Iniciando filme.");
+                    Demonstrator.Display.release();
                 }
+                up();
 
                 status = FanStatus.WATCHING;
                 ExibitionScreen.IsWatching.acquire(); // bloqueia até o filme acabar
 
-                // Após filme, libera o assento e vai lanchar
+//              === FILME FINALIZADO ===
+//                     vai lanchar
                 
-
-                visualFan.moveAndWait(200, 200, 0, 30, 40); // sai da sala
-                visualFan.moveAndWait(750, 150, 1, 40, 40); // até lanche
-
-                status = FanStatus.EATING;
-
                 ExibitionScreen.seatManager.releaseSeat(seatIndex);
                 seatIndex = -1;
+                
+                status = FanStatus.EATING;
+                eating();
 
-                LocalTime initial = LocalTime.now();
-                int lastPrintedSecond = -1;
-                while (true) { 
-                    LocalTime now = LocalTime.now();
-                    Duration duration = Duration.between(initial, now);
-                    float length = duration.toMillis() / 1000f;
-
-                    if (length >= eatingTimer) {
-                        break;
-                    }
-                    int currentSecond = (int) length;
-                    if (currentSecond != lastPrintedSecond) {
-                        int remainingTime = eatingTimer - currentSecond;
-                        System.out.println("[FAN #" + id + "] Lanchando: " + remainingTime + "s restantes");
-                        lastPrintedSecond = currentSecond;
-                    }
-                }
-
-                visualFan.moveAndWait( (510 + (id - 1) * 35), 500, 2, 20, 40);
                 System.out.println("[FAN #" + id + "] Retornou à fila.");
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
