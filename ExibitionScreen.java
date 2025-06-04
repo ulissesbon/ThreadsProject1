@@ -145,21 +145,18 @@ public class ExibitionScreen extends JFrame {
                     mirroredSprites = femaleSpritesMirrored;
                 }
 
-                visualFan = new VisualFan(maleSpritesOriginal, maleSpritesMirrored, 900, 550,2.5);
-
-                Fan fan = new Fan(tempoLanche);
+                visualFan = new VisualFan(maleSpritesOriginal, maleSpritesMirrored, 1000, 515,2.5);
+                
+                Fan fan = new Fan(tempoLanche, visualFan);
                 if (layeredPane != null) {
                     layeredPane.add(visualFan, JLayeredPane.PALETTE_LAYER);
                     layeredPane.repaint();
                 }
-
-                //Fan fan = new Fan(tempoLanche, visualFan);
+                
                 fan.start();
 
-                // TODO movimentação até a fila
-
                 adicionarFanButton.setEnabled(false);
-                Timer delayTimer = new Timer(950, ev -> adicionarFanButton.setEnabled(true));
+                Timer delayTimer = new Timer(500, ev -> adicionarFanButton.setEnabled(true));
                 delayTimer.setRepeats(false);
                 delayTimer.start();
 

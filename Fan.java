@@ -10,9 +10,18 @@ public class Fan extends Thread {
     private final int eatingTimer;
 
     public enum FanStatus { WAITING, WATCHING, EATING }
+    public VisualFan visualFan;
 
     private FanStatus status;
     private int seatIndex;
+
+    public Fan(int eatingTime, VisualFan visualFan) {
+        this.eatingTimer = eatingTime;
+        this.visualFan = visualFan;
+        synchronized (fanIdLock) {
+            this.id = fanCounter++;
+        }
+    }
 
     public Fan(int eatingTime) {
         this.eatingTimer = eatingTime;
@@ -62,11 +71,19 @@ public class Fan extends Thread {
     public void run() {
         while (true) {
             try {
+                ExibitionScreen.Line.release();
+                visualFan.moveAnimated(500, 515, 0, 100, 100, null);
                 status = FanStatus.WAITING;
                 System.out.println("[FAN #" + id + "] Tentando entrar na sala...");
                 
                 down();
                 Demonstrator.EnterRoom.acquire();
+                // TODO: realizar a caminhada até o assento
+                // while (true) { 
+                //     visualFan.moveAndWait(400, 550, 0, 100, 100);
+                //     if (visualFan.getX() == 400 && visualFan.getY() == 500)
+                //         break;
+                // }
                 up();
 
                 seatIndex = ExibitionScreen.seatManager.assignSeat();
