@@ -20,6 +20,8 @@ public class ExibitionScreen extends JFrame {
     private BufferedImage[][] femaleSpritesOriginal;
     private BufferedImage[][] femaleSpritesMirrored;
 
+    private VisualFan visualFan;
+
     public static SeatManager seatManager;
 
     private int fanCount = 0;
@@ -143,13 +145,15 @@ public class ExibitionScreen extends JFrame {
                     mirroredSprites = femaleSpritesMirrored;
                 }
 
+                visualFan = new VisualFan(maleSpritesOriginal, maleSpritesMirrored, 900, 550,2.5);
+
                 Fan fan = new Fan(tempoLanche);
                 if (layeredPane != null) {
                     layeredPane.add(visualFan, JLayeredPane.PALETTE_LAYER);
                     layeredPane.repaint();
                 }
 
-                Fan fan = new Fan(tempoLanche, visualFan);
+                //Fan fan = new Fan(tempoLanche, visualFan);
                 fan.start();
 
                 // TODO movimentação até a fila
