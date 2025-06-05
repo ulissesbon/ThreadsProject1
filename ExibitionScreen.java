@@ -12,6 +12,7 @@ public class ExibitionScreen extends JFrame {
     public static Semaphore Mutex;
     public static Semaphore IsWatching;
     public static Semaphore Line;
+    public static Semaphore FreeRoom;
 
     private JLayeredPane layeredPane;
     private BufferedImage backgroundImage;
@@ -37,6 +38,8 @@ public class ExibitionScreen extends JFrame {
         
         Mutex = new Semaphore(1);
         IsWatching = new Semaphore(0, true);
+        FreeRoom = new Semaphore(0);
+        
 
         seatManager = new SeatManager(ASSENTOS);
 

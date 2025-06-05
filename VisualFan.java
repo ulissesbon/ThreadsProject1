@@ -55,33 +55,80 @@ public class VisualFan extends JLabel {
         return (this.currentSpriteSetToUse == null) ? new BufferedImage[][]{{null}} : this.currentSpriteSetToUse;
     }
 
-    public void moveTo(int targetX, int targetY, int diffBetweenSteps, int delayMs) {
-    Point destinyPoint = new Point(targetX, targetY);
-    Point[] currentPoint = { new Point(getX(), getY()) }; // Usamos um array de tamanho 1 para permitir mutação
+    public void moveToAndWait(int targetX, int targetY, int diffBetweenSteps, int delayMs) {
+        final Object lock = new Object(); // objeto usado por ambas as partes
 
-    Timer timer = new Timer(delayMs, null);
-    timer.addActionListener(e -> {
-        Point current = currentPoint[0];
-        int dx = destinyPoint.x - current.x;
-        int dy = destinyPoint.y - current.y;
+        Point destinyPoint = new Point(targetX, targetY);
+        Point[] currentPoint = { new Point(getX(), getY()) };
 
-        // Chegou ao destino
-        if (Math.abs(dx) <= diffBetweenSteps && Math.abs(dy) <= diffBetweenSteps) {
-            setLocation(destinyPoint);
-            timer.stop();
-            return;
+        final boolean[] finished = {false}; // status de conclusão
+
+        Timer timer = new Timer(delayMs, null);
+        timer.addActionListener(e -> {
+            Point current = currentPoint[0];
+            int dx = destinyPoint.x - current.x;
+            int dy = destinyPoint.y - current.y;
+
+            if (Math.abs(dx) <= diffBetweenSteps && Math.abs(dy) <= diffBetweenSteps) {
+                setLocation(destinyPoint);
+                timer.stop();
+                synchronized (lock) {
+                    finished[0] = true;
+                    lock.notify(); // acorda a thread esperando
+                }
+                return;
+            }
+
+            int stepX = Integer.compare(dx, 0) * diffBetweenSteps;
+            int stepY = Integer.compare(dy, 0) * diffBetweenSteps;
+
+            Point nextPoint = new Point(current.x + stepX, current.y + stepY);
+            setLocation(nextPoint);
+            currentPoint[0] = nextPoint;
+        });
+
+        synchronized (lock) {
+            timer.start();
+            while (!finished[0]) {
+                try {
+                    lock.wait(); // espera até o movimento terminar
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    ex.printStackTrace();
+                }
+            }
         }
+    }
+    
+    public void moveTo(int targetX, int targetY, int diffBetweenSteps, int delayMs) {
+        
+        Point destinyPoint = new Point(targetX, targetY);
+        Point[] currentPoint = { new Point(getX(), getY()) }; // Usamos um array de tamanho 1 para permitir mutação
 
-        int stepX = Integer.compare(dx, 0) * diffBetweenSteps;
-        int stepY = Integer.compare(dy, 0) * diffBetweenSteps;
+        Timer timer = new Timer(delayMs, null);
+        timer.addActionListener(e -> {
+            Point current = currentPoint[0];
+            int dx = destinyPoint.x - current.x;
+            int dy = destinyPoint.y - current.y;
 
-        Point nextPoint = new Point(current.x + stepX, current.y + stepY);
-        setLocation(nextPoint);
-        currentPoint[0] = nextPoint; // Atualiza o ponto atual
-    });
+            // Chegou ao destino
+            if (Math.abs(dx) <= diffBetweenSteps && Math.abs(dy) <= diffBetweenSteps) {
+                setLocation(destinyPoint);
+                timer.stop();
+                return;
+            }
 
-    timer.start();
-}
+            int stepX = Integer.compare(dx, 0) * diffBetweenSteps;
+            int stepY = Integer.compare(dy, 0) * diffBetweenSteps;
+
+            Point nextPoint = new Point(current.x + stepX, current.y + stepY);
+            setLocation(nextPoint);
+            currentPoint[0] = nextPoint; // Atualiza o ponto atual
+        });
+
+        timer.start();
+    }
+
 
 
     public void moveAnimated(int targetX, int targetY, int semanticDirection, int steps, int delayMs, Runnable onFinish) {

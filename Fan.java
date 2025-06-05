@@ -68,7 +68,7 @@ public class Fan extends Thread {
         }
     }
     
-    public void waitToGetThere( int x, int y){
+    public void waitToGetThere(int x, int y){
         while(true){ 
             if(this.visualFan.getX() == x && this.visualFan.getY() == y){
                 break;
@@ -86,24 +86,26 @@ public class Fan extends Thread {
             try {
                 ExibitionScreen.Line.release();
                 visualFan.moveAnimated(500, 515, 0, 100, 100, null);
-                waitToGetThere( 500, 515);
+                // waitToGetThere(500, 515);
                 System.out.println("[FAN #" + id + "] Tentando entrar na sala...");
                 
                 status = FanStatus.WAITING;
-                
-                down();
-                Demonstrator.EnterRoom.acquire();
-                visualFan.moveTo(300, 515, 5, 100);
-                waitToGetThere(300, 515);
-                ExibitionScreen.Line.acquire();
-                up();
 
                 seatIndex = ExibitionScreen.seatManager.assignSeat();
                 Point assento = ExibitionScreen.seatManager.getSeatPosition(seatIndex);
 
-                System.out.println("[FAN #" + id + "] Sentou no assento " + (seatIndex + 1));
-
                 down();
+                // visualFan.moveTo(300, 515, 5, 100);
+                // waitToGetThere(300, 515);
+                // visualFan.moveAndWait(assento.x, assento.y, 0, 5, 100);
+                visualFan.moveToAndWait(assento.x, assento.y, 5, 100);
+                // visualFan.moveTo(assento.x, assento.y, 5, 100);
+                // waitToGetThere(assento.x, assento.y);
+                ExibitionScreen.Line.acquire();
+
+                System.out.println("[FAN #" + id + "] Sentou no assento " + (seatIndex + 1));
+                Demonstrator.EnterRoom.acquire();
+
                 if (Demonstrator.EnterRoom.availablePermits() == 0) {
                     System.out.println("[FAN #" + id + "] Último a entrar. Iniciando filme.");
                     Demonstrator.Display.release();
@@ -115,10 +117,12 @@ public class Fan extends Thread {
 
 //              === FILME FINALIZADO ===
 //                     vai lanchar
-                
                 ExibitionScreen.seatManager.releaseSeat(seatIndex);
                 seatIndex = -1;
+                visualFan.moveToAndWait(415, 215, 5, 100);
                 
+                ExibitionScreen.FreeRoom.release();
+
                 status = FanStatus.EATING;
                 eating();
 
