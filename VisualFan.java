@@ -56,29 +56,33 @@ public class VisualFan extends JLabel {
     }
 
     public void moveTo(int targetX, int targetY, int diffBetweenSteps) {
-        Point startPoint = new Point(getX(), getY());
-        Point destinyPoint = new Point(targetX, targetY);
+    Point destinyPoint = new Point(targetX, targetY);
+    Point[] currentPoint = { new Point(getX(), getY()) }; // Usamos um array de tamanho 1 para permitir mutação
 
-        Point currentPoint = startPoint;
+    Timer timer = new Timer(diffBetweenSteps, null);
+    timer.addActionListener(e -> {
+        Point current = currentPoint[0];
+        int dx = destinyPoint.x - current.x;
+        int dy = destinyPoint.y - current.y;
 
-        while(currentPoint != destinyPoint) {
-            if(startPoint.getX() < destinyPoint.getX() && startPoint.getY() == destinyPoint.getY()){
-                setLocation(targetX + diffBetweenSteps, targetY);
-            } else if(startPoint.getX() < destinyPoint.getX() && startPoint.getY() < destinyPoint.getY()){
-                setLocation(targetX + diffBetweenSteps, targetY + diffBetweenSteps);
-            } else if(startPoint.getX() < destinyPoint.getX() && startPoint.getY() > destinyPoint.getY()){
-                setLocation(targetX + diffBetweenSteps, targetY - diffBetweenSteps);
-            } else if(startPoint.getX() > destinyPoint.getX() && startPoint.getY() == destinyPoint.getY()){
-                setLocation(targetX - diffBetweenSteps, targetY);
-            }  else if(startPoint.getX() < destinyPoint.getX() && startPoint.getY() < destinyPoint.getY()){
-                setLocation(targetX - diffBetweenSteps, targetY - diffBetweenSteps);
-            } else if(startPoint.getX() < destinyPoint.getX() && startPoint.getY() > destinyPoint.getY()){
-                setLocation(targetX - diffBetweenSteps, targetY + diffBetweenSteps);
-            }
-            currentPoint = getLocation();
-            
+        // Chegou ao destino
+        if (Math.abs(dx) <= diffBetweenSteps && Math.abs(dy) <= diffBetweenSteps) {
+            setLocation(destinyPoint);
+            timer.stop();
+            return;
         }
-    }
+
+        int stepX = Integer.compare(dx, 0) * diffBetweenSteps;
+        int stepY = Integer.compare(dy, 0) * diffBetweenSteps;
+
+        Point nextPoint = new Point(current.x + stepX, current.y + stepY);
+        setLocation(nextPoint);
+        currentPoint[0] = nextPoint; // Atualiza o ponto atual
+    });
+
+    timer.start();
+}
+
 
     public void moveAnimated(int targetX, int targetY, int semanticDirection, int steps, int delayMs, Runnable onFinish) {
         int startX = getX();

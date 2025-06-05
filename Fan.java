@@ -72,7 +72,9 @@ public class Fan extends Thread {
         while (true) {
             try {
                 ExibitionScreen.Line.release();
-                visualFan.moveAnimated(500, 515, 0, 100, 100, null);
+                //visualFan.moveAnimated(500, 515, 0, 100, 100, null);
+                visualFan.moveTo(500, 515, 10);
+                visualFan.moveTo(300, 515, 15);
                 status = FanStatus.WAITING;
                 System.out.println("[FAN #" + id + "] Tentando entrar na sala...");
                 
@@ -81,6 +83,7 @@ public class Fan extends Thread {
                 // TODO: realizar a caminhada até o assento
                 // while (true) { 
                 //visualFan.moveAnimated(430, 515, 0, 100, 50, null);
+                //visualFan.moveTo(430, 515, 10);
 
                 //visualFan.moveAndWait(95, 435, 1, 100, 50);
                 //     if (visualFan.getX() == 400 && visualFan.getY() == 500)
