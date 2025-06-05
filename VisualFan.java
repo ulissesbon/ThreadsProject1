@@ -55,11 +55,11 @@ public class VisualFan extends JLabel {
         return (this.currentSpriteSetToUse == null) ? new BufferedImage[][]{{null}} : this.currentSpriteSetToUse;
     }
 
-    public void moveTo(int targetX, int targetY, int diffBetweenSteps) {
+    public void moveTo(int targetX, int targetY, int diffBetweenSteps, int delayMs) {
     Point destinyPoint = new Point(targetX, targetY);
     Point[] currentPoint = { new Point(getX(), getY()) }; // Usamos um array de tamanho 1 para permitir mutação
 
-    Timer timer = new Timer(diffBetweenSteps, null);
+    Timer timer = new Timer(delayMs, null);
     timer.addActionListener(e -> {
         Point current = currentPoint[0];
         int dx = destinyPoint.x - current.x;
