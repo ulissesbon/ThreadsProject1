@@ -80,7 +80,9 @@ public class Fan extends Thread {
                 Demonstrator.EnterRoom.acquire();
                 // TODO: realizar a caminhada até o assento
                 // while (true) { 
-                //     visualFan.moveAndWait(400, 550, 0, 100, 100);
+                //visualFan.moveAnimated(430, 515, 0, 100, 50, null);
+
+                //visualFan.moveAndWait(95, 435, 1, 100, 50);
                 //     if (visualFan.getX() == 400 && visualFan.getY() == 500)
                 //         break;
                 // }

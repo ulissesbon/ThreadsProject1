@@ -55,6 +55,31 @@ public class VisualFan extends JLabel {
         return (this.currentSpriteSetToUse == null) ? new BufferedImage[][]{{null}} : this.currentSpriteSetToUse;
     }
 
+    public void moveTo(int targetX, int targetY, int diffBetweenSteps) {
+        Point startPoint = new Point(getX(), getY());
+        Point destinyPoint = new Point(targetX, targetY);
+
+        Point currentPoint = startPoint;
+
+        while(currentPoint != destinyPoint) {
+            if(startPoint.getX() < destinyPoint.getX() && startPoint.getY() == destinyPoint.getY()){
+                setLocation(targetX + diffBetweenSteps, targetY);
+            } else if(startPoint.getX() < destinyPoint.getX() && startPoint.getY() < destinyPoint.getY()){
+                setLocation(targetX + diffBetweenSteps, targetY + diffBetweenSteps);
+            } else if(startPoint.getX() < destinyPoint.getX() && startPoint.getY() > destinyPoint.getY()){
+                setLocation(targetX + diffBetweenSteps, targetY - diffBetweenSteps);
+            } else if(startPoint.getX() > destinyPoint.getX() && startPoint.getY() == destinyPoint.getY()){
+                setLocation(targetX - diffBetweenSteps, targetY);
+            }  else if(startPoint.getX() < destinyPoint.getX() && startPoint.getY() < destinyPoint.getY()){
+                setLocation(targetX - diffBetweenSteps, targetY - diffBetweenSteps);
+            } else if(startPoint.getX() < destinyPoint.getX() && startPoint.getY() > destinyPoint.getY()){
+                setLocation(targetX - diffBetweenSteps, targetY + diffBetweenSteps);
+            }
+            currentPoint = getLocation();
+            
+        }
+    }
+
     public void moveAnimated(int targetX, int targetY, int semanticDirection, int steps, int delayMs, Runnable onFinish) {
         int startX = getX();
         int startY = getY();
