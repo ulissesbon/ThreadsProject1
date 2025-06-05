@@ -67,40 +67,35 @@ public class Fan extends Thread {
             }
         }
     }
+    
+    public void waitToGetThere( int x, int y){
+        while(true){ 
+            if(this.visualFan.getX() == x && this.visualFan.getY() == y){
+                break;
+            }
+            try {
+                Thread.sleep(500); // para não travar a CPU
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public void run() {
         while (true) {
             try {
                 ExibitionScreen.Line.release();
                 visualFan.moveAnimated(500, 515, 0, 100, 100, null);
-                while (true) {
-                    if (Demonstrator.EnterRoom.availablePermits() > 0) {
-                        break;
-                    }
-
-                    try {
-                        Thread.sleep(50); // para não travar a CPU
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                visualFan.moveTo(400, 515, 5, 100);
-                    
-                    //visualFan.moveTo(300, 515, 15);
-                status = FanStatus.WAITING;
+                waitToGetThere( 500, 515);
                 System.out.println("[FAN #" + id + "] Tentando entrar na sala...");
+                
+                status = FanStatus.WAITING;
                 
                 down();
                 Demonstrator.EnterRoom.acquire();
-                // TODO: realizar a caminhada até o assento
-                // while (true) { 
-                //visualFan.moveAnimated(430, 515, 0, 100, 50, null);
-                //visualFan.moveTo(430, 515, 10);
-
-                //visualFan.moveAndWait(95, 435, 1, 100, 50);
-                //     if (visualFan.getX() == 400 && visualFan.getY() == 500)
-                //         break;
-                // }
+                visualFan.moveTo(300, 515, 5, 100);
+                waitToGetThere(300, 515);
+                ExibitionScreen.Line.acquire();
                 up();
 
                 seatIndex = ExibitionScreen.seatManager.assignSeat();
@@ -110,7 +105,7 @@ public class Fan extends Thread {
 
                 down();
                 if (Demonstrator.EnterRoom.availablePermits() == 0) {
-                    System.out.println("[FAN #" + id + "] Último da sala. Iniciando filme.");
+                    System.out.println("[FAN #" + id + "] Último a entrar. Iniciando filme.");
                     Demonstrator.Display.release();
                 }
                 up();
