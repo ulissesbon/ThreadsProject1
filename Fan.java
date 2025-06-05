@@ -72,9 +72,21 @@ public class Fan extends Thread {
         while (true) {
             try {
                 ExibitionScreen.Line.release();
-                //visualFan.moveAnimated(500, 515, 0, 100, 100, null);
-                visualFan.moveTo(500, 515, 20, 200);
-                //visualFan.moveTo(300, 515, 15);
+                visualFan.moveAnimated(500, 515, 0, 100, 100, null);
+                while (true) {
+                    if (Demonstrator.EnterRoom.availablePermits() > 0) {
+                        break;
+                    }
+
+                    try {
+                        Thread.sleep(50); // para não travar a CPU
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                visualFan.moveTo(400, 515, 5, 100);
+                    
+                    //visualFan.moveTo(300, 515, 15);
                 status = FanStatus.WAITING;
                 System.out.println("[FAN #" + id + "] Tentando entrar na sala...");
                 
