@@ -14,6 +14,10 @@ public class ExibitionScreen extends JFrame {
     public static Semaphore Line;
     public static Semaphore FreeRoom;
 
+    public static ExibitionScreen exibitionScreenInstance;
+
+    private JTextArea logArea;
+    private JScrollPane logScrollPane;
     private JLayeredPane layeredPane;
     private BufferedImage backgroundImage;
     private BufferedImage[][] maleSpritesOriginal;
@@ -28,6 +32,8 @@ public class ExibitionScreen extends JFrame {
     private int fanCount = 0;
 
     public ExibitionScreen(int capacity, int movieTime) {
+        exibitionScreenInstance = this;
+
         setTitle("EXIBIÇÃO");
 
         setSize(1280, 960);
@@ -103,6 +109,19 @@ public class ExibitionScreen extends JFrame {
             mainPanel.add(layeredPane);
         }
 
+        logArea = new JTextArea();
+        logArea.setEditable(false);
+        logArea.setBackground(Color.BLACK);
+        logArea.setForeground(Color.WHITE);
+        logArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+
+        logScrollPane = new JScrollPane(logArea);
+        logScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        logScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        logScrollPane.setBounds(20, 0, 475, 115); // Posição (x, y) e tamanho (width, height)
+
+        // Adiciona ao layeredPane (ou diretamente ao mainPanel se não usar layeredPane)
+        layeredPane.add(logScrollPane, JLayeredPane.PALETTE_LAYER); 
 
         JPanel controlPanel = new JPanel(new FlowLayout());
         controlPanel.setBackground(Color.DARK_GRAY);
@@ -197,5 +216,13 @@ public class ExibitionScreen extends JFrame {
         new Point(296, 290), new Point(363, 290)
         
     };
+
+    public void addLog(String message) {
+        SwingUtilities.invokeLater(() -> {
+            logArea.append(message + "\n");
+            // Auto-scroll para o final
+            logArea.setCaretPosition(logArea.getDocument().getLength());
+        });
+    }
 
 }
