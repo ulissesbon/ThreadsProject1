@@ -62,7 +62,7 @@ public class Fan extends Thread {
             int currentSecond = (int) length;
             if (currentSecond != lastPrintedSecond) {
                 int remainingTime = this.eatingTimer - currentSecond;
-                System.out.println("[FAN #" + id + "] Lanchando: " + remainingTime + "s restantes");
+                ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Lanchando: " + remainingTime + "s restantes");
                 lastPrintedSecond = currentSecond;
             }
         }
@@ -87,7 +87,7 @@ public class Fan extends Thread {
                 ExibitionScreen.Line.release();
                 visualFan.moveAnimated(500, 515, 0, 100, 100, null);
                 // waitToGetThere(500, 515);
-                System.out.println("[FAN #" + id + "] Tentando entrar na sala...");
+                ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Tentando entrar na sala...");
                 
                 status = FanStatus.WAITING;
 
@@ -103,11 +103,11 @@ public class Fan extends Thread {
                 // waitToGetThere(assento.x, assento.y);
                 ExibitionScreen.Line.acquire();
 
-                System.out.println("[FAN #" + id + "] Sentou no assento " + (seatIndex + 1));
+                ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Sentou no assento " + (seatIndex + 1));
                 Demonstrator.EnterRoom.acquire();
 
                 if (Demonstrator.EnterRoom.availablePermits() == 0) {
-                    System.out.println("[FAN #" + id + "] Último a entrar. Iniciando filme.");
+                    ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Último a entrar. Iniciando filme.");
                     Demonstrator.Display.release();
                 }
                 up();
@@ -126,7 +126,7 @@ public class Fan extends Thread {
                 status = FanStatus.EATING;
                 eating();
 
-                System.out.println("[FAN #" + id + "] Retornou à fila.");
+                ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Retornou à fila.");
 
             } catch (InterruptedException e) {
                 e.printStackTrace();

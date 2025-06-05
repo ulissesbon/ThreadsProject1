@@ -42,9 +42,9 @@ public class ExibitionScreen extends JFrame {
 
         Line = new Semaphore(0, true);
         
-        Mutex = new Semaphore(1);
+        Mutex = new Semaphore(1, true);
         IsWatching = new Semaphore(0, true);
-        FreeRoom = new Semaphore(0);
+        FreeRoom = new Semaphore(0, true);
         
 
         seatManager = new SeatManager(ASSENTOS);
@@ -80,14 +80,14 @@ public class ExibitionScreen extends JFrame {
                     g.drawImage(backgroundImage, centerX, centerY, this);
 
                     // debug visual
-                    g.setColor(Color.RED);
-                    for (int x = 0; x <= imgW; x += 25) {
-                        for (int y = 0; y <= imgH; y += 25) {
-                            int px = centerX + x;
-                            int py = centerY + y;
-                            g.fillOval(px - 2, py - 2, 5, 5);
-                        }
-                    }
+                    // g.setColor(Color.RED);
+                    // for (int x = 0; x <= imgW; x += 25) {
+                    //     for (int y = 0; y <= imgH; y += 25) {
+                    //         int px = centerX + x;
+                    //         int py = centerY + y;
+                    //         g.fillOval(px - 2, py - 2, 5, 5);
+                    //     }
+                    // }
                 }
             }
         };

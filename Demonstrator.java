@@ -19,7 +19,7 @@ public class Demonstrator extends Thread {
     }
 
     public void displayMovie() {
-        System.out.println("[DEMONSTRADOR] Iniciando exibição do filme. ");
+        ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Iniciando exibição do filme. ");
                 
         LocalTime initial = LocalTime.now();
         int lastPrintedSecond = -1;
@@ -34,7 +34,7 @@ public class Demonstrator extends Thread {
             int currentSecond = (int) length;
             if (currentSecond != lastPrintedSecond) {
                 int remainingTime = movieLength - currentSecond;
-                System.out.println("[DEMONSTRADOR] Exibindo filme: " + remainingTime + "s restantes");
+                ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Exibindo filme: " + remainingTime + "s restantes");
                 lastPrintedSecond = currentSecond;
             }
         }
@@ -63,7 +63,7 @@ public class Demonstrator extends Thread {
                 // ExibitionScreen.Line.acquire(capacity); // move a fila quando acorda
                 displayMovie();
                 
-                System.out.println("[DEMONSTRADOR] Filme finalizado. Liberando fãs para lanche.");
+                ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Filme finalizado. Liberando fãs para lanche.");
 
                 releasingFans();
                 ExibitionScreen.FreeRoom.acquire();
