@@ -60,6 +60,7 @@ public class Demonstrator extends Thread {
         while (true) {
             try {
                 Display.acquire();  // bloqueado até todos entrarem
+                ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Acordado. Começando filme.");
                 // ExibitionScreen.Line.acquire(capacity); // move a fila quando acorda
                 displayMovie();
                 
