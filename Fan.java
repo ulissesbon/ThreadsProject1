@@ -68,10 +68,24 @@ public class Fan extends Thread {
         }
     }
     
+    public void whatching(){
+        // função para deixar o fã lanchando pelo tempo determinado
+        LocalTime initial = LocalTime.now();
+        int lastPrintedSecond = -1;
+        while (true) { 
+            LocalTime now = LocalTime.now();
+            Duration duration = Duration.between(initial, now);
+            float length = duration.toMillis() / 1000f;
+
+            if (Demonstrator.Display.availablePermits() > 0) {
+                return;
+            }
+        }
+    }
+
     public void run() {
         while (true) {
             try {
-                ExibitionScreen.Line.release();
                 visualFan.moveAnimated(500, 515, 0, 100, 100, null);
                 ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Tentando entrar na sala...");
                 
@@ -81,32 +95,29 @@ public class Fan extends Thread {
                 Point assento = ExibitionScreen.seatManager.getSeatPosition(seatIndex);
 
                 down();
-                // visualFan.moveTo(300, 515, 5, 100);
-                // visualFan.moveAndWait(assento.x, assento.y, 0, 5, 100);
+                Demonstrator.EnterRoom.acquire();
                 visualFan.moveToAndWait(assento.x, assento.y, 5, 100);
+                up();
+                // visualFan.moveAndWait(assento.x, assento.y, 0, 5, 100);
                 // visualFan.moveTo(assento.x, assento.y, 5, 100);
-                ExibitionScreen.Line.acquire();
 
                 ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Sentou no assento " + (seatIndex + 1));
-                Demonstrator.EnterRoom.acquire();
 
-                if (Demonstrator.EnterRoom.availablePermits() == 0) {
+                down();
+                if (Demonstrator.EnterRoom.availablePermits() < 1) {
                     ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Último a entrar. Iniciando filme.");
                     Demonstrator.Display.release();
                 }
                 up();
 
                 status = FanStatus.WATCHING;
-                ExibitionScreen.IsWatching.acquire(); // bloqueia até o filme acabar
-
+                whatching();
 //              === FILME FINALIZADO ===
 //                     vai lanchar
                 ExibitionScreen.seatManager.releaseSeat(seatIndex);
                 seatIndex = -1;
                 visualFan.moveToAndWait(415, 215, 5, 100);
                 
-                ExibitionScreen.FreeRoom.release();
-
                 status = FanStatus.EATING;
                 eating();
 

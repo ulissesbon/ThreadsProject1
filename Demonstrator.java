@@ -66,7 +66,6 @@ public class Demonstrator extends Thread {
                 ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Filme finalizado. Liberando fãs para lanche.");
 
                 releasingFans();
-                ExibitionScreen.FreeRoom.acquire();
                 EnterRoom.release(capacity);
 
             } catch (Exception e) {

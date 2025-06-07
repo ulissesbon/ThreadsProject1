@@ -12,7 +12,6 @@ public class ExibitionScreen extends JFrame {
     public static Semaphore Mutex;
     public static Semaphore IsWatching;
     public static Semaphore Line;
-    public static Semaphore FreeRoom;
 
     public static ExibitionScreen exibitionScreenInstance;
 
@@ -44,7 +43,6 @@ public class ExibitionScreen extends JFrame {
         
         Mutex = new Semaphore(1, true);
         IsWatching = new Semaphore(0, true);
-        FreeRoom = new Semaphore(0, true);
         
 
         seatManager = new SeatManager(ASSENTOS);
@@ -192,7 +190,7 @@ public class ExibitionScreen extends JFrame {
         controlPanel.add(tempoLancheField);
         controlPanel.add(adicionarFanButton);
 
-        add(controlPanel, BorderLayout.SOUTH);
+        add(controlPanel, BorderLayout.NORTH);
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {
