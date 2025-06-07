@@ -68,25 +68,11 @@ public class Fan extends Thread {
         }
     }
     
-    public void waitToGetThere(int x, int y){
-        while(true){ 
-            if(this.visualFan.getX() == x && this.visualFan.getY() == y){
-                break;
-            }
-            try {
-                Thread.sleep(500); // para não travar a CPU
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public void run() {
         while (true) {
             try {
                 ExibitionScreen.Line.release();
                 visualFan.moveAnimated(500, 515, 0, 100, 100, null);
-                // waitToGetThere(500, 515);
                 ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Tentando entrar na sala...");
                 
                 status = FanStatus.WAITING;
@@ -96,11 +82,9 @@ public class Fan extends Thread {
 
                 down();
                 // visualFan.moveTo(300, 515, 5, 100);
-                // waitToGetThere(300, 515);
                 // visualFan.moveAndWait(assento.x, assento.y, 0, 5, 100);
                 visualFan.moveToAndWait(assento.x, assento.y, 5, 100);
                 // visualFan.moveTo(assento.x, assento.y, 5, 100);
-                // waitToGetThere(assento.x, assento.y);
                 ExibitionScreen.Line.acquire();
 
                 ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Sentou no assento " + (seatIndex + 1));
