@@ -15,7 +15,7 @@ public class Demonstrator extends Thread {
         this.movieLength = movieLength;
         
         EnterRoom = new Semaphore(capacity, true);
-        Display = new Semaphore(0);
+        Display = new Semaphore(0, true);
     }
 
     public void displayMovie() {

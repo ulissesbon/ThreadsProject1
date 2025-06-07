@@ -97,18 +97,14 @@ public class Fan extends Thread {
                 down();
                 Demonstrator.EnterRoom.acquire();
                 visualFan.moveToAndWait(assento.x, assento.y, 5, 100);
-                up();
-                // visualFan.moveAndWait(assento.x, assento.y, 0, 5, 100);
-                // visualFan.moveTo(assento.x, assento.y, 5, 100);
-
-                ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Sentou no assento " + (seatIndex + 1));
-
-                down();
                 if (Demonstrator.EnterRoom.availablePermits() < 1) {
                     ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Último a entrar. Iniciando filme.");
+                    ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Sentou no assento " + (seatIndex + 1));
                     Demonstrator.Display.release();
                 }
                 up();
+                // visualFan.moveAndWait(assento.x, assento.y, 0, 5, 100);
+                // visualFan.moveTo(assento.x, assento.y, 5, 100);
 
                 status = FanStatus.WATCHING;
                 whatching();
