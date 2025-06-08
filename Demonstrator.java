@@ -65,7 +65,6 @@ public class Demonstrator extends Thread {
         while (true) {
             try {
                 Display.acquire();  // bloqueado até todos entrarem
-                ExibitionScreen.isFilmRunning.set(true);
                 ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Acordado. Começando filme.");
                 System.out.println("[DEMONSTRADOR] Acordado. Começando filme.");
                 

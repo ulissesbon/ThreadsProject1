@@ -128,6 +128,8 @@ public class Fan extends Thread {
                     System.out.println("[FAN #" + id + "] Último a entrar. Iniciando filme.");
                     ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Sentou no assento " + (seatIndex + 1));
                     System.out.println("[FAN #" + id + "] Sentou no assento " + (seatIndex + 1));
+                    ExibitionScreen.isFilmRunning.set(true);
+                    
                     Demonstrator.Display.release();
                 }
                 up();
