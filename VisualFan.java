@@ -148,6 +148,8 @@ public class VisualFan extends JLabel {
         Point destinyPoint = new Point(targetX, targetY);
         Point[] currentPoint = { new Point(getX(), getY()) }; // Usamos um array de tamanho 1 para permitir mutação
 
+        setCurrentSpriteSheet(spriteSetOriginal);
+
         Timer timer = new Timer(delayMs, null);
         timer.addActionListener(e -> {
             Point current = currentPoint[0];
@@ -167,6 +169,13 @@ public class VisualFan extends JLabel {
             Point nextPoint = new Point(current.x + stepX, current.y + stepY);
             setLocation(nextPoint);
             currentPoint[0] = nextPoint; // Atualiza o ponto atual
+
+            if (useFirstSprite) {
+                setCurrentSpriteSheet(spriteWalking1);
+            } else {
+                setCurrentSpriteSheet(spriteWalking2);
+            }
+            useFirstSprite = !useFirstSprite;
         });
 
         timer.start();
@@ -341,4 +350,44 @@ public class VisualFan extends JLabel {
             return null;
         }
     }
+
+    public void showStatusIcon(String iconPath) {
+    try {
+        BufferedImage iconImage = ImageIO.read(new File(iconPath));
+        JLabel iconLabel = new JLabel(new ImageIcon(iconImage));
+        iconLabel.setSize(iconImage.getWidth(), iconImage.getHeight());
+
+        // Posição do ícone: 10px acima da cabeça
+        int iconX = this.getX() + (this.getWidth() - iconLabel.getWidth()) / 2;
+        int iconY = this.getY() + 20 - iconLabel.getHeight();
+
+        iconLabel.setLocation(iconX, iconY);
+        iconLabel.setName("statusIcon");
+
+        Container parent = this.getParent();
+        if (parent instanceof JLayeredPane) {
+            JLayeredPane pane = (JLayeredPane) parent;
+            removeStatusIcon(); // remove anterior se houver
+            pane.add(iconLabel, JLayeredPane.PALETTE_LAYER);
+            pane.repaint();
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+public void removeStatusIcon() {
+    Container parent = this.getParent();
+    if (parent instanceof JLayeredPane) {
+        JLayeredPane pane = (JLayeredPane) parent;
+        for (Component comp : pane.getComponents()) {
+            if (comp instanceof JLabel && "statusIcon".equals(comp.getName())) {
+                pane.remove(comp);
+                pane.repaint();
+                break;
+            }
+        }
+    }
+}
+
 }
