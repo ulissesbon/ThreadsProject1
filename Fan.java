@@ -79,14 +79,15 @@ public class Fan extends Thread {
         System.out.println("[FAN #" + id + "] Assistindo ao filme...");
 
         while (ExibitionScreen.isFilmRunning.get()) {
+            visualFan.showStatusIcon("watchingIcon.png");
             long now = System.nanoTime();
 
             if (now - lastUpdate >= frameDuration) {
                 lastUpdate = now;
 
             }
+        visualFan.removeStatusIcon();
         }
-
         ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Filme terminou.");
         System.out.println("[FAN #" + id + "] Filme terminou.");
     }

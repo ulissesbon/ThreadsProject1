@@ -394,7 +394,7 @@ public class VisualFan extends JLabel {
             JLayeredPane pane = (JLayeredPane) parent;
             removeStatusIcon(); // remove anterior se houver
             pane.add(iconLabel, JLayeredPane.PALETTE_LAYER);
-            pane.repaint();
+            //pane.repaint();
         }
     } catch (Exception e) {
         e.printStackTrace();
