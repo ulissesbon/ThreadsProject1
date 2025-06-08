@@ -32,6 +32,7 @@ public class ExibitionScreen extends JFrame {
     private BufferedImage[][] maleWalking1;
     private BufferedImage[][] maleWalkingMirrored2;
     private BufferedImage[][] maleWalking2;
+    private BufferedImage[][] maleFrontStatic;
 
     private VisualFan visualFan;
 
@@ -70,6 +71,7 @@ public class ExibitionScreen extends JFrame {
             maleStaticMirrored = VisualFan.loadSpriteSheet("maleStaticMirrored.png", 1, 1);
             maleWalkingMirrored1 = VisualFan.loadSpriteSheet("maleWalkingMirrored1.png", 1, 1);
             maleWalkingMirrored2 = VisualFan.loadSpriteSheet("maleWalkingMirrored2.png", 1, 1);
+            maleFrontStatic = VisualFan.loadSpriteSheet("maleFrontStatic.png", 1, 1);
 
 
 
@@ -181,7 +183,7 @@ public class ExibitionScreen extends JFrame {
                     mirroredSprites = femaleSpritesMirrored;
                 }
 
-                visualFan = new VisualFan(maleStatic, maleStaticMirrored, 1000, 515,2.5);
+                visualFan = new VisualFan(maleFrontStatic, maleStaticMirrored, maleWalking1, maleWalking2, 1000, 515,2.5);
                 
                 Fan fan = new Fan(tempoLanche, visualFan);
                 if (layeredPane != null) {

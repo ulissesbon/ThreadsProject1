@@ -48,6 +48,7 @@ public class Fan extends Thread {
 
     public void eating(){
         // função para deixar o fã lanchando pelo tempo determinado
+        visualFan.showStatusIcon("eatingIcon.png");
         LocalTime initial = LocalTime.now();
         int lastPrintedSecond = -1;
         while (true) { 
@@ -67,6 +68,7 @@ public class Fan extends Thread {
                 lastPrintedSecond = currentSecond;
             }
         }
+        visualFan.removeStatusIcon();
     }
     
     public void whatching(){
