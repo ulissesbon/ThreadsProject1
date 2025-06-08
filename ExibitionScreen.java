@@ -3,6 +3,7 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
@@ -12,6 +13,8 @@ public class ExibitionScreen extends JFrame {
     public static Semaphore Mutex;
     public static Semaphore IsWatching;
     public static Semaphore Line;
+
+    public static AtomicBoolean isFilmRunning = new AtomicBoolean(false);
 
     public static ExibitionScreen exibitionScreenInstance;
 
