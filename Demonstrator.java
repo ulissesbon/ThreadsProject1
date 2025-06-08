@@ -20,6 +20,8 @@ public class Demonstrator extends Thread {
 
     public void displayMovie() {
         ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Iniciando exibição do filme. ");
+        System.out.println("[DEMONSTRADOR] Iniciando exibição do filme. ");
+        
                 
         LocalTime initial = LocalTime.now();
         int lastPrintedSecond = -1;
@@ -35,6 +37,8 @@ public class Demonstrator extends Thread {
             if (currentSecond != lastPrintedSecond) {
                 int remainingTime = movieLength - currentSecond;
                 ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Exibindo filme: " + remainingTime + "s restantes");
+                System.out.println("[DEMONSTRADOR] Exibindo filme: " + remainingTime + "s restantes");
+                
                 lastPrintedSecond = currentSecond;
             }
         }
@@ -63,9 +67,13 @@ public class Demonstrator extends Thread {
                 Display.acquire();  // bloqueado até todos entrarem
                 ExibitionScreen.isFilmRunning.set(true);
                 ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Acordado. Começando filme.");
+                System.out.println("[DEMONSTRADOR] Acordado. Começando filme.");
+                
                 displayMovie();
                 
                 ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Filme finalizado. Liberando fãs para lanche.");
+                System.out.println("[DEMONSTRADOR] Filme finalizado. Liberando fãs para lanche.");
+                
 
                 releasingFans();
                 Display = new Semaphore(0);
