@@ -21,9 +21,12 @@ public class VisualFan extends JLabel {
     private BufferedImage[][] spriteSetOriginal;
     private BufferedImage[][] spriteSetMirrored;
     private BufferedImage[][] currentSpriteSetToUse;
+    private BufferedImage[][] spriteWalking1;
+    private BufferedImage[][] spriteWalking2;
     private int spriteIndex = 0;
     private double scale;
     private static final int SPRITE_DEFAULT_WIDTH_OR_HEIGHT = 32; // Fallback if sprite is null
+    private boolean useFirstSprite = true;
 
     public VisualFan(BufferedImage[][] spriteSetOriginal, BufferedImage[][] spriteSetMirrored, int x, int y, double scale) {
         this.spriteSetOriginal = spriteSetOriginal;
@@ -47,12 +50,38 @@ public class VisualFan extends JLabel {
         setBounds(x, y, scaledWidth, scaledHeight);
     }
 
+    public VisualFan(BufferedImage[][] spriteSetOriginal, BufferedImage[][] spriteSetMirrored, BufferedImage[][] spriteWalking1, BufferedImage[][] spriteWalking2, int x, int y, double scale) {
+        this.spriteSetOriginal = spriteSetOriginal;
+        this.spriteSetMirrored = spriteSetMirrored;
+        this.spriteWalking1 = spriteWalking1;
+        this.spriteWalking2 = spriteWalking2;
+        this.scale = scale;
+        this.currentSpriteSetToUse = this.spriteSetOriginal; // Default
+
+        BufferedImage initialSprite = null;
+        if (this.currentSpriteSetToUse != null &&
+            SHEET_ROW_ANIM_DOWN < this.currentSpriteSetToUse.length &&
+            this.currentSpriteSetToUse[SHEET_ROW_ANIM_DOWN] != null &&
+            this.currentSpriteSetToUse[SHEET_ROW_ANIM_DOWN].length > 0) {
+            initialSprite = this.currentSpriteSetToUse[SHEET_ROW_ANIM_DOWN][0];
+        }
+        
+        ImageIcon icon = new ImageIcon(resizeSprite(initialSprite));
+        setIcon(icon);
+
+        int scaledWidth = icon.getIconWidth() > 0 ? icon.getIconWidth() : (int)(SPRITE_DEFAULT_WIDTH_OR_HEIGHT * scale);
+        int scaledHeight = icon.getIconHeight() > 0 ? icon.getIconHeight() : (int)(SPRITE_DEFAULT_WIDTH_OR_HEIGHT * scale);
+        setBounds(x, y, scaledWidth, scaledHeight);
+    }
+
+
     public VisualFan(BufferedImage[][] spriteSetOriginal, BufferedImage[][] spriteSetMirrored, int x, int y) {
         this(spriteSetOriginal, spriteSetMirrored, x, y, 1.5);
     }
 
     public void setCurrentSpriteSheet(BufferedImage[][] SpriteSetToUse){
         this.currentSpriteSetToUse = SpriteSetToUse;
+        repaint();
     }
 
     private BufferedImage[][] getEffectiveSpriteSet() {
@@ -67,6 +96,8 @@ public class VisualFan extends JLabel {
 
         final boolean[] finished = {false}; // status de conclusão
 
+        setCurrentSpriteSheet(spriteSetOriginal);
+
         Timer timer = new Timer(delayMs, null);
         timer.addActionListener(e -> {
             Point current = currentPoint[0];
@@ -75,6 +106,7 @@ public class VisualFan extends JLabel {
 
             if (Math.abs(dx) <= diffBetweenSteps && Math.abs(dy) <= diffBetweenSteps) {
                 setLocation(destinyPoint);
+                setCurrentSpriteSheet(spriteSetOriginal);
                 timer.stop();
                 synchronized (lock) {
                     finished[0] = true;
@@ -89,6 +121,13 @@ public class VisualFan extends JLabel {
             Point nextPoint = new Point(current.x + stepX, current.y + stepY);
             setLocation(nextPoint);
             currentPoint[0] = nextPoint;
+
+            if (useFirstSprite) {
+                setCurrentSpriteSheet(spriteWalking1);
+            } else {
+                setCurrentSpriteSheet(spriteWalking2);
+            }
+            useFirstSprite = !useFirstSprite;
         });
 
         synchronized (lock) {

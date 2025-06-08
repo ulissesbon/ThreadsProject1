@@ -178,7 +178,7 @@ public class ExibitionScreen extends JFrame {
                     mirroredSprites = femaleSpritesMirrored;
                 }
 
-                visualFan = new VisualFan(maleStatic, maleStaticMirrored, 1000, 515,2.5);
+                visualFan = new VisualFan(maleStatic, maleStaticMirrored, maleWalking1, maleWalking2, 1000, 515,2.5);
                 
                 Fan fan = new Fan(tempoLanche, visualFan);
                 if (layeredPane != null) {
