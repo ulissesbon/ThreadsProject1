@@ -90,7 +90,7 @@ public class Fan extends Thread {
     public void run() {
         while (true) {
             try {
-                visualFan.moveAnimated(500, 515, 0, 100, 100, null);
+                visualFan.moveToAndWait(500, 515, 5, 100);
                 ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Tentando entrar na sala...");
                 
                 status = FanStatus.WAITING;
