@@ -15,7 +15,7 @@ public class Demonstrator extends Thread {
         this.movieLength = movieLength;
         
         EnterRoom = new Semaphore(capacity, true);
-        Display = new Semaphore(0, true);
+        Display = new Semaphore(0);
     }
 
     public void displayMovie() {
@@ -41,6 +41,7 @@ public class Demonstrator extends Thread {
     }
 
     private void releasingFans() {
+        ExibitionScreen.isFilmRunning.set(false);
         for (int i = 0; i < capacity; i++) {
             ExibitionScreen.IsWatching.release(); // libera os fãs dormindo quando acaba o filme
             
@@ -60,14 +61,14 @@ public class Demonstrator extends Thread {
         while (true) {
             try {
                 Display.acquire();  // bloqueado até todos entrarem
+                ExibitionScreen.isFilmRunning.set(true);
                 ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Acordado. Começando filme.");
-                // ExibitionScreen.Line.acquire(capacity); // move a fila quando acorda
                 displayMovie();
                 
                 ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Filme finalizado. Liberando fãs para lanche.");
 
                 releasingFans();
-                EnterRoom.release(capacity);
+                Display = new Semaphore(0);
 
             } catch (Exception e) {
                 e.printStackTrace();

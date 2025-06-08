@@ -60,6 +60,31 @@ public class VisualFan extends JLabel {
     }
 
     public void moveToAndWait(int targetX, int targetY, int diffBetweenSteps, int delayMs) {
+        Point current = new Point(getX(), getY());
+        Point destiny = new Point(targetX, targetY);
+
+        // Enquanto não chegou suficientemente perto do destino
+        while (Math.abs(destiny.x - current.x) > diffBetweenSteps || Math.abs(destiny.y - current.y) > diffBetweenSteps) {
+            int dx = Integer.compare(destiny.x - current.x, 0) * diffBetweenSteps;
+            int dy = Integer.compare(destiny.y - current.y, 0) * diffBetweenSteps;
+
+            Point next = new Point(current.x + dx, current.y + dy);
+            setLocation(next);
+            current = next;
+
+            // opcional: tempo baseado no parâmetro delayMs, mas sem usar Thread.sleep()
+            long now = System.nanoTime();
+            long waitUntil = now + (delayMs * 1_000_000L);
+            while (System.nanoTime() < waitUntil) {
+                // busy-wait até atingir o tempo de "delay" por passo
+            }
+        }
+
+        // Movimento final para garantir que está exatamente no destino
+        setLocation(destiny);
+    }
+
+    public void _moveToAndWait(int targetX, int targetY, int diffBetweenSteps, int delayMs) {
         final Object lock = new Object(); // objeto usado por ambas as partes
 
         Point destinyPoint = new Point(targetX, targetY);
