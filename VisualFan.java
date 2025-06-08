@@ -51,6 +51,10 @@ public class VisualFan extends JLabel {
         this(spriteSetOriginal, spriteSetMirrored, x, y, 1.5);
     }
 
+    public void setCurrentSpriteSheet(BufferedImage[][] SpriteSetToUse){
+        this.currentSpriteSetToUse = SpriteSetToUse;
+    }
+
     private BufferedImage[][] getEffectiveSpriteSet() {
         return (this.currentSpriteSetToUse == null) ? new BufferedImage[][]{{null}} : this.currentSpriteSetToUse;
     }
