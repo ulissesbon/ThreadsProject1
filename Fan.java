@@ -92,20 +92,15 @@ public class Fan extends Thread {
         System.out.println("[FAN #" + id + "] Filme terminou.");
     }
 
-    public void waitingMovie() {
+    public void waitingMovie() throws InterruptedException {
         ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Sentado. Aguardando início do filme...");
         System.out.println("[FAN #" + id + "] Sentado. Aguardando início do filme...");
 
         // Enquanto o filme ainda não começou, o fã pode dormir
         while (!ExibitionScreen.isFilmRunning.get()) {
             synchronized (ExibitionScreen.isFilmRunning) {
-                try {
-                    ExibitionScreen.isFilmRunning.wait(); // FAN dorme até filme começar
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    e.printStackTrace();
-                    return;
-                }
+                //ExibitionScreen.isFilmRunning.wait();
+                Thread.onSpinWait(); // FAN dorme até filme começar
             }
         }
 
