@@ -143,7 +143,6 @@ public class Fan extends Thread {
                 ExibitionScreen.seatManager.releaseSeat(seatIndex);
                 seatIndex = -1;
                 visualFan.moveToAndWait(415, 215, 5, 100);
-                Demonstrator.EnterRoom.release();
                 
                 status = FanStatus.EATING;
                 eating();
