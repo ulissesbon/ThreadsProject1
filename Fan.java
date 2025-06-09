@@ -48,10 +48,10 @@ public class Fan extends Thread {
 
     public void eating(){
         // função para deixar o fã lanchando pelo tempo determinado
-        visualFan.showStatusIcon("eatingIcon.png");
         LocalTime initial = LocalTime.now();
         int lastPrintedSecond = -1;
         while (true) { 
+            visualFan.showStatusIcon("eatingIcon.png");
             LocalTime now = LocalTime.now();
             Duration duration = Duration.between(initial, now);
             float length = duration.toMillis() / 1000f;
@@ -154,7 +154,7 @@ public class Fan extends Thread {
                 seatIndex = -1;
                 visualFan.moveToAndWait(415, 215, 5, 100);
                 
-                visualFan.moveToAndWait(515 + (id * 30), 215, 5, 100);
+                visualFan.moveToAndWait(555 + (id * 30), 215, 5, 100);
                 status = FanStatus.EATING;
                 eating();
 
