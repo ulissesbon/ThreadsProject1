@@ -11,7 +11,7 @@ public class ConfigScreen extends JFrame {
         setTitle("Configuração Inicial");
         setSize(400, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Centraliza a janela
+        setLocationRelativeTo(null);
 
         JLabel tempoFilmeLabel = new JLabel("Tempo do Filme:");
         tempoFilmeField = new JTextField(10);
@@ -52,14 +52,13 @@ public class ConfigScreen extends JFrame {
                 // inicia o programa
                 ExibitionScreen exibition = new ExibitionScreen(capacidade, tempoFilme);
                 exibition.setVisible(true);
-                dispose(); // Fecha a tela de configuração
+                dispose();
 
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Insira valores numéricos válidos.");
             }
         });
 
-        // === Monta o painel ===
         JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -67,7 +66,7 @@ public class ConfigScreen extends JFrame {
         panel.add(tempoFilmeField);
         panel.add(capacidadeLabel);
         panel.add(capacidadeField);
-        panel.add(new JLabel()); // Espaço vazio
+        panel.add(new JLabel()); // espaço vazio
         panel.add(iniciarButton);
 
         add(panel);

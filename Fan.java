@@ -23,17 +23,6 @@ public class Fan extends Thread {
         }
     }
 
-    public Fan(int eatingTime) {
-        this.eatingTimer = eatingTime;
-        synchronized (fanIdLock) {
-            this.id = fanCounter++;
-        }
-    }
-
-    public int getIdNum() {
-        return this.id;
-    }
-    
     public void down(){
         try {
             ExibitionScreen.Mutex.acquire();
@@ -96,11 +85,10 @@ public class Fan extends Thread {
         ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Sentado. Aguardando início do filme...");
         System.out.println("[FAN #" + id + "] Sentado. Aguardando início do filme...");
 
-        // Enquanto o filme ainda não começou, o fã pode dormir
+        // fã dorme no aguardo do filme
         while (!ExibitionScreen.isFilmRunning.get()) {
             synchronized (ExibitionScreen.isFilmRunning) {
-                //ExibitionScreen.isFilmRunning.wait();
-                Thread.onSpinWait(); // FAN dorme até filme começar
+                Thread.onSpinWait();
             }
         }
 
@@ -115,7 +103,7 @@ public class Fan extends Thread {
                 System.out.println("[FAN #" + id + "] Tentando entrar na sala...");
                 visualFan.moveToAndWait(500, 515, 5, 50);
                 
-                status = FanStatus.WAITING;
+                this.status = FanStatus.WAITING;
 
                 Demonstrator.EnterRoom.acquire();
                 seatIndex = ExibitionScreen.seatManager.assignSeat();
@@ -135,17 +123,17 @@ public class Fan extends Thread {
                 up();
 
                 waitingMovie();
-                // TODO: ajeitar a lógica, estão saindo antes do tempo
-                status = FanStatus.WATCHING;
+                
+                this.status = FanStatus.WATCHING;
                 whatching();
+
 //              === FILME FINALIZADO ===
-//                     vai lanchar
                 ExibitionScreen.seatManager.releaseSeat(seatIndex);
                 seatIndex = -1;
                 visualFan.moveToAndWait(415, 215, 5, 100);
                 Demonstrator.EnterRoom.release();
                 
-                status = FanStatus.EATING;
+                this.status = FanStatus.EATING;
                 eating();
 
                 ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Retornou à fila.");
