@@ -113,14 +113,14 @@ public class Fan extends Thread {
             try {
                 ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Tentando entrar na sala...");
                 System.out.println("[FAN #" + id + "] Tentando entrar na sala...");
-                visualFan.moveToAndWait(500, 515, 5, 100);
+                visualFan.moveToAndWait(500, 515, 5, 50);
                 
                 status = FanStatus.WAITING;
 
                 Demonstrator.EnterRoom.acquire();
                 seatIndex = ExibitionScreen.seatManager.assignSeat();
                 Point assento = ExibitionScreen.seatManager.getSeatPosition(seatIndex);
-                visualFan.moveToAndWait(assento.x, assento.y, 5, 100);
+                visualFan.moveToAndWait(assento.x, assento.y, 5, 0);
 
                 down();
                 if (Demonstrator.EnterRoom.availablePermits() == 0) {
