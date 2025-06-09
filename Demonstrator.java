@@ -7,6 +7,8 @@ public class Demonstrator extends Thread {
     private int capacity;
     private int movieLength;
 
+    public static int capacidade;
+
     public static Semaphore EnterRoom;
     public static Semaphore Display;
 
@@ -16,6 +18,8 @@ public class Demonstrator extends Thread {
         
         EnterRoom = new Semaphore(capacity, true);
         Display = new Semaphore(0);
+
+        capacidade = this.capacity;
     }
 
     public void displayMovie() {
@@ -61,6 +65,10 @@ public class Demonstrator extends Thread {
         }
     }
 
+    public static int getCapacity(){
+        return capacidade;
+    }
+
     public void run() {
         while (true) {
             try {
@@ -74,7 +82,6 @@ public class Demonstrator extends Thread {
                 ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Filme finalizado. Liberando fãs para lanche.");
                 System.out.println("[DEMONSTRADOR] Filme finalizado. Liberando fãs para lanche.");
                 
-
                 releasingFans();
                 EnterRoom.release(capacity);
 
