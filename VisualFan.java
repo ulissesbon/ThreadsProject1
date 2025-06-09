@@ -5,14 +5,18 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class VisualFan extends JLabel {
+    // Semantic Directions (to be used by Fan.java)
     public static final int DIRECTION_DOWN = 0;
     public static final int DIRECTION_LEFT = 1;
     public static final int DIRECTION_RIGHT = 2;
     public static final int DIRECTION_UP = 3;
 
+    // Actual row indices in the sprite sheets for animations
+    // These MUST correspond to how your sprite sheets are organized.
+    // Example: If your side-view animation (left/right) is in the 2nd row of the sheet (index 1)
     private static final int SHEET_ROW_ANIM_DOWN = 0;
-    private static final int SHEET_ROW_ANIM_SIDE = 1;
-    private static final int SHEET_ROW_ANIM_UP = 3;
+    private static final int SHEET_ROW_ANIM_SIDE = 1; // Assuming row 1 (0-indexed) is for side-facing frames
+    private static final int SHEET_ROW_ANIM_UP = 3;   // Assuming row 3 is for up-facing frames
 
     private BufferedImage[][] spriteSetOriginal;
     private BufferedImage[][] spriteSetMirrored;
@@ -52,7 +56,7 @@ public class VisualFan extends JLabel {
         this.spriteWalking1 = spriteWalking1;
         this.spriteWalking2 = spriteWalking2;
         this.scale = scale;
-        this.currentSpriteSetToUse = this.spriteSetOriginal;
+        this.currentSpriteSetToUse = this.spriteSetOriginal; // Default
 
         BufferedImage initialSprite = null;
         if (this.currentSpriteSetToUse != null &&
@@ -70,6 +74,7 @@ public class VisualFan extends JLabel {
         setBounds(x, y, scaledWidth, scaledHeight);
     }
 
+
     public VisualFan(BufferedImage[][] spriteSetOriginal, BufferedImage[][] spriteSetMirrored, int x, int y) {
         this(spriteSetOriginal, spriteSetMirrored, x, y, 1.5);
     }
@@ -79,10 +84,15 @@ public class VisualFan extends JLabel {
         repaint();
     }
 
+    private BufferedImage[][] getEffectiveSpriteSet() {
+        return (this.currentSpriteSetToUse == null) ? new BufferedImage[][]{{null}} : this.currentSpriteSetToUse;
+    }
+
     public void moveToAndWait(int targetX, int targetY, int diffBetweenSteps, int delayMs) {
         Point current = new Point(getX(), getY());
         Point destiny = new Point(targetX, targetY);
 
+        // Enquanto não chegou suficientemente perto do destino
         while (Math.abs(destiny.x - current.x) > diffBetweenSteps || Math.abs(destiny.y - current.y) > diffBetweenSteps) {
             int dx = Integer.compare(destiny.x - current.x, 0) * diffBetweenSteps;
             int dy = Integer.compare(destiny.y - current.y, 0) * diffBetweenSteps;
@@ -91,6 +101,7 @@ public class VisualFan extends JLabel {
             setLocation(next);
             current = next;
 
+            // opcional: tempo baseado no parâmetro delayMs, mas sem usar Thread.sleep()
             long now = System.nanoTime();
             long waitUntil = now + (delayMs * 1_000_000L);
             while (System.nanoTime() < waitUntil) {
@@ -98,11 +109,12 @@ public class VisualFan extends JLabel {
             }
         }
 
+        // Movimento final para garantir que está exatamente no destino
         setLocation(destiny);
     }
 
     public void _moveToAndWait(int targetX, int targetY, int diffBetweenSteps, int delayMs) {
-        final Object lock = new Object();
+        final Object lock = new Object(); // objeto usado por ambas as partes
 
         Point destinyPoint = new Point(targetX, targetY);
         Point[] currentPoint = { new Point(getX(), getY()) };
@@ -155,10 +167,149 @@ public class VisualFan extends JLabel {
             }
         }
     }
+    
+    public void moveTo(int targetX, int targetY, int diffBetweenSteps, int delayMs) {
+        
+        Point destinyPoint = new Point(targetX, targetY);
+        Point[] currentPoint = { new Point(getX(), getY()) }; // Usamos um array de tamanho 1 para permitir mutação
+
+        setCurrentSpriteSheet(spriteSetOriginal);
+
+        Timer timer = new Timer(delayMs, null);
+        timer.addActionListener(e -> {
+            Point current = currentPoint[0];
+            int dx = destinyPoint.x - current.x;
+            int dy = destinyPoint.y - current.y;
+
+            // Chegou ao destino
+            if (Math.abs(dx) <= diffBetweenSteps && Math.abs(dy) <= diffBetweenSteps) {
+                setLocation(destinyPoint);
+                timer.stop();
+                return;
+            }
+
+            int stepX = Integer.compare(dx, 0) * diffBetweenSteps;
+            int stepY = Integer.compare(dy, 0) * diffBetweenSteps;
+
+            Point nextPoint = new Point(current.x + stepX, current.y + stepY);
+            setLocation(nextPoint);
+            currentPoint[0] = nextPoint; // Atualiza o ponto atual
+
+            if (useFirstSprite) {
+                setCurrentSpriteSheet(spriteWalking1);
+            } else {
+                setCurrentSpriteSheet(spriteWalking2);
+            }
+            useFirstSprite = !useFirstSprite;
+        });
+
+        timer.start();
+    }
+
+
+
+    public void moveAnimated(int targetX, int targetY, int semanticDirection, int steps, int delayMs, Runnable onFinish) {
+        int startX = getX();
+        int startY = getY();
+
+        if (steps <= 0) {
+            setLocation(targetX, targetY);
+            if (onFinish != null) onFinish.run();
+            return;
+        }
+
+        int dx = (targetX - startX) / steps;
+        // int dy = (targetY - startY) / steps; // dy not directly used for sheet choice here
+
+        int actualSheetRow; // The row index to use from the chosen sprite sheet
+
+        switch (semanticDirection) {
+            case DIRECTION_LEFT:
+                this.currentSpriteSetToUse = this.spriteSetMirrored; // Use mirrored sheet for left-facing
+                actualSheetRow = SHEET_ROW_ANIM_SIDE;
+                break;
+            case DIRECTION_RIGHT:
+                this.currentSpriteSetToUse = this.spriteSetOriginal;  // Use original sheet for right-facing
+                actualSheetRow = SHEET_ROW_ANIM_SIDE;
+                break;
+            case DIRECTION_UP:
+                this.currentSpriteSetToUse = this.spriteSetOriginal;
+                actualSheetRow = SHEET_ROW_ANIM_UP;
+                break;
+            case DIRECTION_DOWN:
+            default: // Default to down
+                this.currentSpriteSetToUse = this.spriteSetOriginal;
+                actualSheetRow = SHEET_ROW_ANIM_DOWN;
+                break;
+        }
+
+        // Fallback if the chosen primary sheet for a direction is null (e.g. mirrored not loaded)
+        if (this.currentSpriteSetToUse == null) {
+            if (semanticDirection == DIRECTION_LEFT && this.spriteSetOriginal != null) {
+                this.currentSpriteSetToUse = this.spriteSetOriginal; // Try original if mirrored failed
+            } else if (semanticDirection == DIRECTION_RIGHT && this.spriteSetMirrored != null) {
+                this.currentSpriteSetToUse = this.spriteSetMirrored; // Try mirrored if original failed
+            } else { // For up/down or if both options for side view failed
+                this.currentSpriteSetToUse = (this.spriteSetOriginal != null) ? this.spriteSetOriginal : this.spriteSetMirrored;
+            }
+        }
+        // If still null, no sprites are available.
+        if (this.currentSpriteSetToUse == null && (this.spriteSetOriginal != null || this.spriteSetMirrored != null)) {
+             //This case implies one of them should have been picked
+             this.currentSpriteSetToUse = (this.spriteSetOriginal != null) ? this.spriteSetOriginal : this.spriteSetMirrored;
+             // And pick a default animation row if the intended one caused issues
+             if (this.currentSpriteSetToUse == this.spriteSetMirrored && semanticDirection == DIRECTION_RIGHT) actualSheetRow = SHEET_ROW_ANIM_SIDE;
+             else if (this.currentSpriteSetToUse == this.spriteSetOriginal && semanticDirection == DIRECTION_LEFT) actualSheetRow = SHEET_ROW_ANIM_SIDE;
+             // else actualSheetRow is already set
+        }
+
+
+        final int[] step = {0};
+        Timer timer = new Timer(delayMs, null);
+
+        // Final actualSheetRow to be used in lambda, needs to be effectively final
+        final int animationRow = actualSheetRow;
+
+        timer.addActionListener(e -> {
+            BufferedImage[][] effectiveSpriteSet = getEffectiveSpriteSet(); // Gets currentSpriteSetToUse
+
+            if (effectiveSpriteSet == null ||
+                animationRow < 0 || animationRow >= effectiveSpriteSet.length ||
+                effectiveSpriteSet[animationRow] == null ||
+                effectiveSpriteSet[animationRow].length == 0) {
+                // Invalid animation sequence, stop and finalize
+                ((Timer) e.getSource()).stop();
+                setLocation(targetX, targetY); // Move to final destination
+                // Optionally set a default/error icon here
+                if (onFinish != null) onFinish.run();
+                return;
+            }
+
+            if (step[0] >= steps) {
+                ((Timer) e.getSource()).stop();
+                setLocation(targetX, targetY);
+                BufferedImage stoppedSprite = resizeSprite(effectiveSpriteSet[animationRow][0]);
+                setIcon(new ImageIcon(stoppedSprite));
+                if (onFinish != null) onFinish.run();
+                return;
+            }
+
+            int currentX = getX() + dx; // dx is calculated based on startX, targetX, steps
+            int currentY = getY() + ((targetY - startY) / steps); // Recalculate dy for precision
+            setLocation(currentX, currentY);
+
+            spriteIndex = (spriteIndex + 1) % effectiveSpriteSet[animationRow].length;
+            BufferedImage nextSprite = resizeSprite(effectiveSpriteSet[animationRow][spriteIndex]);
+            setIcon(new ImageIcon(nextSprite));
+
+            step[0]++;
+        });
+        timer.start();
+    }
 
     private BufferedImage resizeSprite(BufferedImage original) {
         if (original == null) {
-            return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+            return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB); // Transparent placeholder
         }
         int width = (int)(original.getWidth() * scale);
         int height = (int)(original.getHeight() * scale);
@@ -171,6 +322,22 @@ public class VisualFan extends JLabel {
         g2d.drawImage(scaled, 0, 0, null);
         g2d.dispose();
         return resized;
+    }
+
+    public void moveAndWait(int targetX, int targetY, int semanticDirection, int steps, int delayMs) {
+        final Object lock = new Object();
+        Runnable onFinishLocal = () -> {
+            synchronized (lock) { lock.notify(); }
+        };
+        synchronized (lock) {
+            moveAnimated(targetX, targetY, semanticDirection, steps, delayMs, onFinishLocal);
+            try {
+                lock.wait();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                e.printStackTrace();
+            }
+        }
     }
 
     public static BufferedImage[][] loadSpriteSheet(String filename, int rows, int cols) {
@@ -215,6 +382,7 @@ public class VisualFan extends JLabel {
         JLabel iconLabel = new JLabel(new ImageIcon(iconImage));
         iconLabel.setSize(iconImage.getWidth(), iconImage.getHeight());
 
+        // Posição do ícone: 10px acima da cabeça
         int iconX = this.getX() + (this.getWidth() - iconLabel.getWidth()) / 2;
         int iconY = this.getY() + 20 - iconLabel.getHeight();
 

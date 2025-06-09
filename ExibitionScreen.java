@@ -11,14 +11,8 @@ public class ExibitionScreen extends JFrame {
 
     
     public static Semaphore Mutex;
-    public static Semaphore Line;
     public static Semaphore IsWatching;
-
-    private VisualFan visualFan;
-
-    public static SeatManager seatManager;
-
-    private int fanCount = 0;
+    public static Semaphore Line;
 
     public static AtomicBoolean isFilmRunning = new AtomicBoolean(false);
 
@@ -39,6 +33,12 @@ public class ExibitionScreen extends JFrame {
     private BufferedImage[][] maleWalkingMirrored2;
     private BufferedImage[][] maleWalking2;
     private BufferedImage[][] maleFrontStatic;
+
+    private VisualFan visualFan;
+
+    public static SeatManager seatManager;
+
+    private int fanCount = 0;
 
     public ExibitionScreen(int capacity, int movieTime) {
         exibitionScreenInstance = this;
@@ -74,8 +74,9 @@ public class ExibitionScreen extends JFrame {
             maleFrontStatic = VisualFan.loadSpriteSheet("maleFrontStatic.png", 1, 1);
 
 
+
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Print error for debugging
             JOptionPane.showMessageDialog(this, "Erro ao carregar imagem de fundo ou sprites.");
             return;
         }
@@ -93,6 +94,16 @@ public class ExibitionScreen extends JFrame {
                     g.setColor(Color.BLACK);
                     g.fillRect(0, 0, getWidth(), getHeight());
                     g.drawImage(backgroundImage, centerX, centerY, this);
+
+                    // debug visual
+                    // g.setColor(Color.RED);
+                    // for (int x = 0; x <= imgW; x += 25) {
+                    //     for (int y = 0; y <= imgH; y += 25) {
+                    //         int px = centerX + x;
+                    //         int py = centerY + y;
+                    //         g.fillOval(px - 2, py - 2, 5, 5);
+                    //     }
+                    // }
                 }
             }
         };
@@ -123,8 +134,9 @@ public class ExibitionScreen extends JFrame {
         logScrollPane = new JScrollPane(logArea);
         logScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         logScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        logScrollPane.setBounds(20, 0, 475, 115); // posição (x, y) e tamanho (width, height)
+        logScrollPane.setBounds(20, 0, 475, 115); // Posição (x, y) e tamanho (width, height)
 
+        // Adiciona ao layeredPane (ou diretamente ao mainPanel se não usar layeredPane)
         layeredPane.add(logScrollPane, JLayeredPane.PALETTE_LAYER); 
 
         JPanel controlPanel = new JPanel(new FlowLayout());
@@ -135,6 +147,7 @@ public class ExibitionScreen extends JFrame {
         JTextField tempoLancheField = new JTextField("5", 5);
         JButton adicionarFanButton = new JButton("Adicionar Fã");
         tempoLancheField.addActionListener(e -> adicionarFanButton.doClick());
+
 
         Demonstrator demonstrator = new Demonstrator(capacity, movieTime);
         demonstrator.start();
