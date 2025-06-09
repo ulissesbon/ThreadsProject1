@@ -76,7 +76,7 @@ public class Demonstrator extends Thread {
                 
 
                 releasingFans();
-                Display = new Semaphore(0);
+                EnterRoom.release(capacity);
 
             } catch (Exception e) {
                 e.printStackTrace();

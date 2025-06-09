@@ -397,7 +397,7 @@ public class VisualFan extends JLabel {
             //pane.repaint();
         }
     } catch (Exception e) {
-        e.printStackTrace();
+        
     }
 }
 
