@@ -50,11 +50,16 @@ public class Fan extends Thread {
         // função para deixar o fã lanchando pelo tempo determinado
         LocalTime initial = LocalTime.now();
         int lastPrintedSecond = -1;
+
+        int soma = 0;
+
         while (true) { 
             visualFan.showStatusIcon("eatingIcon.png");
             LocalTime now = LocalTime.now();
             Duration duration = Duration.between(initial, now);
             float length = duration.toMillis() / 1000f;
+
+            soma = (int) (soma + Math.sin(length));
 
             if (length >= (float) this.eatingTimer) {
                 break;
@@ -143,8 +148,10 @@ public class Fan extends Thread {
                 }
                 up();
 
-                waitingMovie();
-
+                // waitingMovie();
+                ExibitionScreen.IsWatching.acquire();
+                ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] acordando para ver filme.");
+                System.out.println("[FAN #" + id + "]  acordando para ver filme.");
                 status = FanStatus.WATCHING;
                 whatching();
 

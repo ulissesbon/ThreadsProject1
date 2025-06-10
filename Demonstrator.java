@@ -23,6 +23,7 @@ public class Demonstrator extends Thread {
     }
 
     public void displayMovie() {
+        ExibitionScreen.IsWatching.release(capacidade);
         ExibitionScreen.exibitionScreenInstance.addLog("[DEMONSTRADOR] Iniciando exibição do filme. ");
         System.out.println("[DEMONSTRADOR] Iniciando exibição do filme. ");
         
@@ -51,7 +52,6 @@ public class Demonstrator extends Thread {
     private void releasingFans() {
         ExibitionScreen.isFilmRunning.set(false);
         for (int i = 0; i < capacity; i++) {
-            ExibitionScreen.IsWatching.release(); // libera os fãs dormindo quando acaba o filme
             
             LocalTime initial = LocalTime.now();
             while (true) {
