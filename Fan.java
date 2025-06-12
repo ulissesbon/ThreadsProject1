@@ -97,22 +97,6 @@ public class Fan extends Thread {
         System.out.println("[FAN #" + id + "] Filme terminou.");
     }
 
-    public void waitingMovie() throws InterruptedException {
-        ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] Sentado. Aguardando início do filme...");
-        System.out.println("[FAN #" + id + "] Sentado. Aguardando início do filme...");
-
-        // Enquanto o filme ainda não começou, o fã pode dormir
-        while (!ExibitionScreen.isFilmRunning.get()) {
-            synchronized (ExibitionScreen.isFilmRunning) {
-                //ExibitionScreen.isFilmRunning.wait();
-                Thread.onSpinWait(); // FAN dorme até filme começar
-            }
-        }
-
-        ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] O filme começou!");
-        System.out.println("[FAN #" + id + "] O filme começou!");
-    }
-
     public void run() {
         down();
         int fila = ExibitionScreen.Line.availablePermits();
@@ -148,7 +132,6 @@ public class Fan extends Thread {
                 }
                 up();
 
-                // waitingMovie();
                 ExibitionScreen.IsWatching.acquire();
                 ExibitionScreen.exibitionScreenInstance.addLog("[FAN #" + id + "] acordando para ver filme.");
                 System.out.println("[FAN #" + id + "]  acordando para ver filme.");

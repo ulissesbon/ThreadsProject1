@@ -58,8 +58,7 @@ public class ExibitionScreen extends JFrame {
         seatManager = new SeatManager(ASSENTOS);
 
         try {
-            backgroundImage = ImageIO.read(new File("background[1.0].png")); // Assuming the background with cantina is the one to use
-
+            backgroundImage = ImageIO.read(new File("background[1.0].png"));
             int rows = 12, cols = 8;
             maleSpritesOriginal = VisualFan.loadSpriteSheet("zMale1.png", rows, cols);
             maleSpritesMirrored = VisualFan.loadSpriteSheet("zMaleMirrored.png", rows, cols);
@@ -76,7 +75,7 @@ public class ExibitionScreen extends JFrame {
 
 
         } catch (Exception e) {
-            e.printStackTrace(); // Print error for debugging
+            e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Erro ao carregar imagem de fundo ou sprites.");
             return;
         }
@@ -94,16 +93,6 @@ public class ExibitionScreen extends JFrame {
                     g.setColor(Color.BLACK);
                     g.fillRect(0, 0, getWidth(), getHeight());
                     g.drawImage(backgroundImage, centerX, centerY, this);
-
-                    // debug visual
-                    // g.setColor(Color.RED);
-                    // for (int x = 0; x <= imgW; x += 25) {
-                    //     for (int y = 0; y <= imgH; y += 25) {
-                    //         int px = centerX + x;
-                    //         int py = centerY + y;
-                    //         g.fillOval(px - 2, py - 2, 5, 5);
-                    //     }
-                    // }
                 }
             }
         };
@@ -134,9 +123,8 @@ public class ExibitionScreen extends JFrame {
         logScrollPane = new JScrollPane(logArea);
         logScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         logScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        logScrollPane.setBounds(20, 0, 475, 115); // Posição (x, y) e tamanho (width, height)
+        logScrollPane.setBounds(20, 0, 475, 115); // posição (x, y) e tamanho (width, height)
 
-        // Adiciona ao layeredPane (ou diretamente ao mainPanel se não usar layeredPane)
         layeredPane.add(logScrollPane, JLayeredPane.PALETTE_LAYER); 
 
         JPanel controlPanel = new JPanel(new FlowLayout());
@@ -236,7 +224,6 @@ public class ExibitionScreen extends JFrame {
     public void addLog(String message) {
         SwingUtilities.invokeLater(() -> {
             logArea.append(message + "\n");
-            // Auto-scroll para o final
             logArea.setCaretPosition(logArea.getDocument().getLength());
         });
     }
